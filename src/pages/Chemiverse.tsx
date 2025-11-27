@@ -9,41 +9,187 @@ import { Astra } from '../components/Astra';
 
 // Molecule Data
 const MOLECULES = {
-    water: {
-        name: "Water (H₂O)",
-        description: "The elixir of life! Two hydrogen atoms bonded to one oxygen atom.",
+    // Linear
+    hf: {
+        name: "Hydrogen Fluoride (HF)",
+        description: "Linear molecule. Used in etching glass.",
         atoms: [
-            { position: [0, 0, 0], color: "#ef4444", size: 0.6, label: "O" }, // Oxygen
-            { position: [0.8, 0.6, 0], color: "#f5f5f5", size: 0.3, label: "H" }, // Hydrogen
-            { position: [-0.8, 0.6, 0], color: "#f5f5f5", size: 0.3, label: "H" }, // Hydrogen
+            { position: [0.5, 0, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.4, 0, 0], color: "#90e0ef", size: 0.6, label: "F" },
         ],
-        bonds: [
-            { start: [0, 0, 0], end: [0.8, 0.6, 0] },
-            { start: [0, 0, 0], end: [-0.8, 0.6, 0] },
-        ]
+        bonds: [{ start: [0.5, 0, 0], end: [-0.4, 0, 0] }]
+    },
+    hcl: {
+        name: "Hydrogen Chloride (HCl)",
+        description: "Linear molecule. Major component of stomach acid.",
+        atoms: [
+            { position: [0.6, 0, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.5, 0, 0], color: "#1f7a1f", size: 0.7, label: "Cl" },
+        ],
+        bonds: [{ start: [0.6, 0, 0], end: [-0.5, 0, 0] }]
+    },
+    hbr: {
+        name: "Hydrogen Bromide (HBr)",
+        description: "Linear molecule. Used to produce bromides.",
+        atoms: [
+            { position: [0.7, 0, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.6, 0, 0], color: "#7f0000", size: 0.75, label: "Br" },
+        ],
+        bonds: [{ start: [0.7, 0, 0], end: [-0.6, 0, 0] }]
+    },
+    hi: {
+        name: "Hydrogen Iodide (HI)",
+        description: "Linear molecule. Strong acid used in organic synthesis.",
+        atoms: [
+            { position: [0.8, 0, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.7, 0, 0], color: "#9400d3", size: 0.8, label: "I" },
+        ],
+        bonds: [{ start: [0.8, 0, 0], end: [-0.7, 0, 0] }]
+    },
+    h2: {
+        name: "Hydrogen (H₂)",
+        description: "Linear molecule. The most abundant element in the universe.",
+        atoms: [
+            { position: [0.4, 0, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.4, 0, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+        ],
+        bonds: [{ start: [0.4, 0, 0], end: [-0.4, 0, 0] }]
     },
     co2: {
         name: "Carbon Dioxide (CO₂)",
-        description: "A greenhouse gas. One carbon atom double-bonded to two oxygen atoms.",
+        description: "Linear molecule. A greenhouse gas.",
         atoms: [
-            { position: [0, 0, 0], color: "#1d1d1f", size: 0.5, label: "C" }, // Carbon
-            { position: [1.2, 0, 0], color: "#ef4444", size: 0.5, label: "O" }, // Oxygen
-            { position: [-1.2, 0, 0], color: "#ef4444", size: 0.5, label: "O" }, // Oxygen
+            { position: [0, 0, 0], color: "#1d1d1f", size: 0.5, label: "C" },
+            { position: [1.2, 0, 0], color: "#ef4444", size: 0.5, label: "O" },
+            { position: [-1.2, 0, 0], color: "#ef4444", size: 0.5, label: "O" },
         ],
         bonds: [
             { start: [0, 0, 0], end: [1.2, 0, 0] },
             { start: [0, 0, 0], end: [-1.2, 0, 0] },
         ]
     },
+
+    // Bent
+    water: {
+        name: "Water (H₂O)",
+        description: "Bent molecule. The elixir of life!",
+        atoms: [
+            { position: [0, 0.1, 0], color: "#ef4444", size: 0.6, label: "O" },
+            { position: [0.8, -0.4, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.8, -0.4, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+        ],
+        bonds: [
+            { start: [0, 0.1, 0], end: [0.8, -0.4, 0] },
+            { start: [0, 0.1, 0], end: [-0.8, -0.4, 0] },
+        ]
+    },
+    h2s: {
+        name: "Hydrogen Sulfide (H₂S)",
+        description: "Bent molecule. Smells like rotten eggs.",
+        atoms: [
+            { position: [0, 0.1, 0], color: "#ffd700", size: 0.65, label: "S" },
+            { position: [0.9, -0.4, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.9, -0.4, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+        ],
+        bonds: [
+            { start: [0, 0.1, 0], end: [0.9, -0.4, 0] },
+            { start: [0, 0.1, 0], end: [-0.9, -0.4, 0] },
+        ]
+    },
+
+    // Trigonal Pyramidal
+    nh3: {
+        name: "Ammonia (NH₃)",
+        description: "Trigonal Pyramidal. Used in fertilizers.",
+        atoms: [
+            { position: [0, 0.2, 0], color: "#0000ff", size: 0.6, label: "N" },
+            { position: [0.8, -0.4, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.4, -0.4, 0.7], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.4, -0.4, -0.7], color: "#f5f5f5", size: 0.3, label: "H" },
+        ],
+        bonds: [
+            { start: [0, 0.2, 0], end: [0.8, -0.4, 0] },
+            { start: [0, 0.2, 0], end: [-0.4, -0.4, 0.7] },
+            { start: [0, 0.2, 0], end: [-0.4, -0.4, -0.7] },
+        ]
+    },
+    nf3: {
+        name: "Nitrogen Trifluoride (NF₃)",
+        description: "Trigonal Pyramidal. Greenhouse gas.",
+        atoms: [
+            { position: [0, 0.2, 0], color: "#0000ff", size: 0.6, label: "N" },
+            { position: [0.9, -0.4, 0], color: "#90e0ef", size: 0.4, label: "F" },
+            { position: [-0.45, -0.4, 0.8], color: "#90e0ef", size: 0.4, label: "F" },
+            { position: [-0.45, -0.4, -0.8], color: "#90e0ef", size: 0.4, label: "F" },
+        ],
+        bonds: [
+            { start: [0, 0.2, 0], end: [0.9, -0.4, 0] },
+            { start: [0, 0.2, 0], end: [-0.45, -0.4, 0.8] },
+            { start: [0, 0.2, 0], end: [-0.45, -0.4, -0.8] },
+        ]
+    },
+
+    // Trigonal Planar
+    bf3: {
+        name: "Boron Trifluoride (BF₃)",
+        description: "Trigonal Planar. Lewis acid.",
+        atoms: [
+            { position: [0, 0, 0], color: "#ffb6c1", size: 0.5, label: "B" },
+            { position: [0, 1.2, 0], color: "#90e0ef", size: 0.4, label: "F" },
+            { position: [1.04, -0.6, 0], color: "#90e0ef", size: 0.4, label: "F" },
+            { position: [-1.04, -0.6, 0], color: "#90e0ef", size: 0.4, label: "F" },
+        ],
+        bonds: [
+            { start: [0, 0, 0], end: [0, 1.2, 0] },
+            { start: [0, 0, 0], end: [1.04, -0.6, 0] },
+            { start: [0, 0, 0], end: [-1.04, -0.6, 0] },
+        ]
+    },
+
+    // Tetrahedral
     methane: {
         name: "Methane (CH₄)",
-        description: "The simplest hydrocarbon. One carbon atom bonded to four hydrogen atoms.",
+        description: "Tetrahedral. Simplest hydrocarbon.",
         atoms: [
-            { position: [0, 0, 0], color: "#1d1d1f", size: 0.5, label: "C" }, // Carbon
-            { position: [0.8, 0.8, 0.8], color: "#f5f5f5", size: 0.3, label: "H" }, // Hydrogen
-            { position: [-0.8, -0.8, 0.8], color: "#f5f5f5", size: 0.3, label: "H" }, // Hydrogen
-            { position: [0.8, -0.8, -0.8], color: "#f5f5f5", size: 0.3, label: "H" }, // Hydrogen
-            { position: [-0.8, 0.8, -0.8], color: "#f5f5f5", size: 0.3, label: "H" }, // Hydrogen
+            { position: [0, 0, 0], color: "#1d1d1f", size: 0.5, label: "C" },
+            { position: [0.6, 0.6, 0.6], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.6, -0.6, 0.6], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [0.6, -0.6, -0.6], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [-0.6, 0.6, -0.6], color: "#f5f5f5", size: 0.3, label: "H" },
+        ],
+        bonds: [
+            { start: [0, 0, 0], end: [0.6, 0.6, 0.6] },
+            { start: [0, 0, 0], end: [-0.6, -0.6, 0.6] },
+            { start: [0, 0, 0], end: [0.6, -0.6, -0.6] },
+            { start: [0, 0, 0], end: [-0.6, 0.6, -0.6] },
+        ]
+    },
+    chcl3: {
+        name: "Chloroform (CHCl₃)",
+        description: "Tetrahedral. Formerly used as anesthetic.",
+        atoms: [
+            { position: [0, 0, 0], color: "#1d1d1f", size: 0.5, label: "C" },
+            { position: [0, 0.8, 0], color: "#f5f5f5", size: 0.3, label: "H" },
+            { position: [0.94, -0.33, 0], color: "#1f7a1f", size: 0.5, label: "Cl" },
+            { position: [-0.47, -0.33, 0.82], color: "#1f7a1f", size: 0.5, label: "Cl" },
+            { position: [-0.47, -0.33, -0.82], color: "#1f7a1f", size: 0.5, label: "Cl" },
+        ],
+        bonds: [
+            { start: [0, 0, 0], end: [0, 0.8, 0] },
+            { start: [0, 0, 0], end: [0.94, -0.33, 0] },
+            { start: [0, 0, 0], end: [-0.47, -0.33, 0.82] },
+            { start: [0, 0, 0], end: [-0.47, -0.33, -0.82] },
+        ]
+    },
+    ccl4: {
+        name: "Carbon Tetrachloride (CCl₄)",
+        description: "Tetrahedral. Cleaning agent.",
+        atoms: [
+            { position: [0, 0, 0], color: "#1d1d1f", size: 0.5, label: "C" },
+            { position: [0.8, 0.8, 0.8], color: "#1f7a1f", size: 0.5, label: "Cl" },
+            { position: [-0.8, -0.8, 0.8], color: "#1f7a1f", size: 0.5, label: "Cl" },
+            { position: [0.8, -0.8, -0.8], color: "#1f7a1f", size: 0.5, label: "Cl" },
+            { position: [-0.8, 0.8, -0.8], color: "#1f7a1f", size: 0.5, label: "Cl" },
         ],
         bonds: [
             { start: [0, 0, 0], end: [0.8, 0.8, 0.8] },
@@ -51,7 +197,7 @@ const MOLECULES = {
             { start: [0, 0, 0], end: [0.8, -0.8, -0.8] },
             { start: [0, 0, 0], end: [-0.8, 0.8, -0.8] },
         ]
-    }
+    },
 };
 
 const AtomMesh = ({ position, color, size, label }: any) => (
@@ -173,7 +319,7 @@ export const Chemiverse: React.FC = () => {
                             <div className="font-bold text-brand-black">{MOLECULES[activeMolecule].name}</div>
                         </div>
 
-                        <Canvas camera={{ position: [0, 0, 4], fov: 50 }}>
+                        <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
                             <Suspense fallback={null}>
                                 <MoleculeScene molecule={activeMolecule} />
                             </Suspense>

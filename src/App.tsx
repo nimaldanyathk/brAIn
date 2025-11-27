@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Layout } from './layouts/Layout';
 import { Home } from './pages/Home';
 import { PhysiX } from './pages/PhysiX';
@@ -8,27 +9,129 @@ import { NewtonLaws } from './features/physix/NewtonLaws';
 import { Momentum } from './features/physix/Momentum';
 import { Energy } from './features/physix/Energy';
 import { Gravitation } from './features/physix/Gravitation';
-import { Chemiverse } from './pages/Chemiverse';
 import { MathOdyssey } from './pages/MathOdyssey';
+import { Chemiverse } from './pages/Chemiverse';
+import { RayOptics } from './pages/RayOptics';
+import { Login } from './pages/Login';
+import { ProjectileMotion } from './pages/ProjectileMotion';
+import { supabase } from './lib/supabase';
+
+// Protected Route Component
+const AuthGuard = ({ children }: { children: React.ReactNode }) => {
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check for Demo Session first
+    const demoSession = localStorage.getItem('demo_session');
+    if (demoSession) {
+      setSession({ user: { email: 'demo@brain.app' } }); // Mock session object
+      setLoading(false);
+      return;
+    }
+
+    // Check Supabase Session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-surface-gray">
+        <div className="w-8 h-8 border-4 border-brand-black border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+};
 
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/physix" element={<PhysiX />} />
-          <Route path="/physix/ohms-law" element={<OhmsLaw />} />
-          <Route path="/physix/vectors" element={<VectorAddition />} />
-          <Route path="/physix/newton" element={<NewtonLaws />} />
-          <Route path="/physix/momentum" element={<Momentum />} />
-          <Route path="/physix/energy" element={<Energy />} />
-          <Route path="/physix/gravitation" element={<Gravitation />} />
-          <Route path="/chemiverse" element={<Chemiverse />} />
-          <Route path="/math" element={<MathOdyssey />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+
+          {/* Protected Routes */}
+          <Route path="physix" element={
+            <AuthGuard>
+              <PhysiX />
+            </AuthGuard>
+          } />
+          <Route path="physix/ohms-law" element={
+            <AuthGuard>
+              <OhmsLaw />
+            </AuthGuard>
+          } />
+          <Route path="physix/vectors" element={
+            <AuthGuard>
+              <VectorAddition />
+            </AuthGuard>
+          } />
+          <Route path="physix/newton" element={
+            <AuthGuard>
+              <NewtonLaws />
+            </AuthGuard>
+          } />
+          <Route path="physix/momentum" element={
+            <AuthGuard>
+              <Momentum />
+            </AuthGuard>
+          } />
+          <Route path="physix/energy" element={
+            <AuthGuard>
+              <Energy />
+            </AuthGuard>
+          } />
+          <Route path="physix/gravitation" element={
+            <AuthGuard>
+              <Gravitation />
+            </AuthGuard>
+          } />
+          <Route path="physix/optics" element={
+            <AuthGuard>
+              <RayOptics />
+            </AuthGuard>
+          } />
+          <Route path="physix/motion" element={
+            <AuthGuard>
+              <ProjectileMotion />
+            </AuthGuard>
+          } />
+
+          <Route path="math" element={
+            <AuthGuard>
+              <MathOdyssey />
+            </AuthGuard>
+          } />
+
+          <Route path="chemistry" element={
+            <AuthGuard>
+              <Chemiverse />
+            </AuthGuard>
+          } />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </Router>
   );
 }

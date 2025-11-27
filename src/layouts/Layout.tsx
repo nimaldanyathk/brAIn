@@ -1,81 +1,128 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Atom, FlaskConical, Calculator, Home, User, Menu } from 'lucide-react';
-import { cn } from '../lib/utils';
+import React, { useEffect, useState } from 'react';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Brain, Atom, Calculator, FlaskConical, LogOut, User } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
+import { Astra } from '../components/Astra';
 
-interface LayoutProps {
-    children: React.ReactNode;
-}
-
-export const Layout: React.FC<LayoutProps> = ({ children }) => {
+export const Layout: React.FC = () => {
+    const navigate = useNavigate();
     const location = useLocation();
+    const [user, setUser] = useState<any>(null);
 
-    const navItems = [
-        { icon: Home, label: 'Home', path: '/' },
-        { icon: FlaskConical, label: 'Chemiverse', path: '/chemiverse', color: 'text-green-600' },
-        { icon: Atom, label: 'PhysiX', path: '/physix', color: 'text-blue-600' },
-        { icon: Calculator, label: 'Math Odyssey', path: '/math', color: 'text-yellow-600' },
-    ];
+    useEffect(() => {
+        // Check for Demo Session
+        const demoSession = localStorage.getItem('demo_session');
+        if (demoSession) {
+            setUser({
+                user_metadata: {
+                    full_name: 'Demo Cadet',
+                    avatar_url: null
+                },
+                email: 'demo@brain.app'
+            });
+            return;
+        }
+
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            setUser(user);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const handleSignOut = async () => {
+        localStorage.removeItem('demo_session');
+        await supabase.auth.signOut();
+        navigate('/login');
+    };
 
     return (
-        <div className="flex flex-col h-screen w-full overflow-hidden bg-white">
-            {/* Top Navigation Bar - Tactile */}
-            <header className="h-20 bg-white border-b-2 border-black flex items-center justify-between px-8 z-30">
-                <div className="flex items-center gap-12">
-                    {/* Logo */}
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]">
-                            B
-                        </div>
-                        <span className="text-2xl font-display font-black text-black tracking-tight hidden md:block">
-                            brAIn
-                        </span>
+        <div className="flex flex-col h-screen bg-surface-gray overflow-hidden font-sans text-brand-black selection:bg-brand-blue selection:text-white">
+            {/* Top Navigation Bar */}
+            <header className="h-16 bg-white border-b-2 border-black flex items-center justify-between px-6 shrink-0 z-50">
+                {/* Logo */}
+                {/* Logo */}
+                <div
+                    className="flex items-center gap-3 cursor-pointer group"
+                    onClick={() => navigate('/')}
+                >
+                    <div className="w-10 h-10 bg-brand-black rounded-lg flex items-center justify-center border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-all">
+                        <Brain className="w-6 h-6 text-white" />
                     </div>
-
-                    {/* Desktop Nav */}
-                    <nav className="hidden md:flex items-center gap-2">
-                        {navItems.map((item) => (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                className={cn(
-                                    "flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 text-sm font-bold border-2",
-                                    location.pathname === item.path
-                                        ? "bg-black text-white border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)]"
-                                        : "bg-white text-gray-500 border-transparent hover:border-gray-200 hover:text-black"
-                                )}
-                            >
-                                <item.icon className={cn("w-4 h-4", location.pathname === item.path ? "text-white" : "text-gray-400")} />
-                                <span>{item.label}</span>
-                            </Link>
-                        ))}
-                    </nav>
+                    <span className="text-2xl font-display font-black tracking-tight group-hover:text-brand-blue transition-colors">brAIn</span>
                 </div>
 
-                {/* Right Actions */}
+                {/* Navigation Links */}
+                <nav className="hidden md:flex items-center gap-2">
+                    <NavLink
+                        to="/physix"
+                        className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-lg font-bold border-2 transition-all ${isActive ? 'bg-blue-100 border-black text-brand-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'border-transparent text-gray-500 hover:text-brand-black hover:bg-gray-100'}`}
+                    >
+                        <Atom className="w-4 h-4" /> PhysiX
+                    </NavLink>
+                    <NavLink
+                        to="/math"
+                        className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-lg font-bold border-2 transition-all ${isActive ? 'bg-yellow-100 border-black text-brand-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'border-transparent text-gray-500 hover:text-brand-black hover:bg-gray-100'}`}
+                    >
+                        <Calculator className="w-4 h-4" /> Math
+                    </NavLink>
+                    <NavLink
+                        to="/chemistry"
+                        className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-lg font-bold border-2 transition-all ${isActive ? 'bg-green-100 border-black text-brand-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'border-transparent text-gray-500 hover:text-brand-black hover:bg-gray-100'}`}
+                    >
+                        <FlaskConical className="w-4 h-4" /> Chemistry
+                    </NavLink>
+                </nav>
+
+                {/* User Profile */}
                 <div className="flex items-center gap-4">
-                    <div className="hidden md:flex items-center gap-4 pl-6 border-l-2 border-gray-100">
-                        <div className="text-right">
-                            <p className="text-sm font-black leading-none">Cadet Alex</p>
-                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mt-1">Lvl 5 Explorer</p>
+                    {user ? (
+                        <div className="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            {user.user_metadata.avatar_url ? (
+                                <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-8 h-8 rounded-lg border-2 border-black" />
+                            ) : (
+                                <div className="w-8 h-8 bg-brand-blue rounded-lg border-2 border-black flex items-center justify-center text-white">
+                                    <User className="w-4 h-4" />
+                                </div>
+                            )}
+                            <span className="text-sm font-bold hidden sm:block">{user.user_metadata.full_name || user.email?.split('@')[0]}</span>
+                            <button
+                                onClick={handleSignOut}
+                                className="ml-2 p-1 hover:bg-red-100 rounded-lg transition-colors text-gray-500 hover:text-red-600"
+                                title="Sign Out"
+                            >
+                                <LogOut className="w-4 h-4" />
+                            </button>
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-black flex items-center justify-center">
-                            <User className="w-5 h-5 text-black" />
-                        </div>
-                    </div>
-                    <Button variant="ghost" size="sm" className="md:hidden">
-                        <Menu className="w-6 h-6" />
-                    </Button>
+                    ) : (
+                        <Button size="sm" onClick={() => navigate('/login')}>
+                            Sign In
+                        </Button>
+                    )}
                 </div>
             </header>
 
-            {/* Main Content */}
-            <main className="flex-1 relative overflow-hidden bg-gray-50">
-                <div className="h-full overflow-y-auto p-6 md:p-12">
-                    {children}
+            {/* Main Content Area */}
+            <main className="flex-1 overflow-y-auto relative p-6 scroll-smooth">
+                <div className="h-full w-full max-w-7xl mx-auto flex flex-col">
+                    <Outlet />
                 </div>
             </main>
+
+            {/* Global AI Assistant */}
+            <Astra context={getContext(location.pathname)} />
         </div>
     );
 };
+
+function getContext(path: string): 'physics' | 'math' | 'chemistry' | 'general' {
+    if (path.includes('physix')) return 'physics';
+    if (path.includes('math')) return 'math';
+    if (path.includes('chemistry') || path.includes('chemiverse')) return 'chemistry';
+    return 'general';
+}

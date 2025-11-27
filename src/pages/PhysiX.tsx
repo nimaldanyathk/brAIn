@@ -61,7 +61,7 @@ export const PhysiX: React.FC = () => {
             title: "Ray Optics",
             description: "Explore reflection and refraction with lasers.",
             icon: Lock,
-            locked: true,
+            locked: false,
             path: '/physix/optics',
         },
         {
@@ -69,7 +69,7 @@ export const PhysiX: React.FC = () => {
             title: "Projectile Motion",
             description: "Launch objects and study their trajectory.",
             icon: Lock,
-            locked: true,
+            locked: false,
             path: '/physix/motion',
         },
     ];
