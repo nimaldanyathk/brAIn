@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Sparkles } from 'lucide-react';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Button } from './ui/Button';
 import { cn } from '../lib/utils';
+
+// Initialize Gemini API
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 export type AstraEmotion = 'idle' | 'happy' | 'thinking' | 'warning';
 export type AstraContext = 'physics' | 'math' | 'chemistry' | 'general';
@@ -11,19 +18,20 @@ interface Message {
     id: string;
     text: string;
     sender: 'user' | 'astra';
+    isError?: boolean;
 }
 
 interface AstraProps {
     emotion?: AstraEmotion;
     size?: 'sm' | 'md' | 'lg';
     context?: AstraContext;
+    // Keeping topic to avoid breaking parent components, even if unused in this version
+    topic?: string;
 }
 
 export const Astra: React.FC<AstraProps> = ({ context = 'general' }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState<Message[]>([
-        { id: '1', text: getGreeting(context), sender: 'astra' }
-    ]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -34,11 +42,15 @@ export const Astra: React.FC<AstraProps> = ({ context = 'general' }) => {
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages, isOpen]);
+    }, [messages, isOpen, isTyping]);
 
     // Reset greeting when context changes
     useEffect(() => {
-        setMessages([{ id: Date.now().toString(), text: getGreeting(context), sender: 'astra' }]);
+        setMessages([{
+            id: Date.now().toString(),
+            text: getGreeting(context),
+            sender: 'astra'
+        }]);
     }, [context]);
 
     function getGreeting(ctx: AstraContext) {
@@ -50,6 +62,18 @@ export const Astra: React.FC<AstraProps> = ({ context = 'general' }) => {
         }
     }
 
+    const getSystemPrompt = (ctx: AstraContext) => {
+        const basePrompt = "You are Astra, a helpful, enthusiastic AI tutor for students in a virtual STEM lab called 'brAIn'.";
+        const formatting = "Use Markdown for formatting. Use bold for key terms. Use bullet points for lists. Keep answers concise (under 3 sentences) unless asked for detail.";
+
+        switch (ctx) {
+            case 'physics': return `${basePrompt} You specialize in Physics. Explain concepts using real-world examples (gravity, forces, electricity). ${formatting}`;
+            case 'math': return `${basePrompt} You specialize in Mathematics. Help solve problems step-by-step and explain the logic clearly. Use LaTeX formatting for equations where necessary. ${formatting}`;
+            case 'chemistry': return `${basePrompt} You specialize in Chemistry. Explain molecular structures, reactions, and periodic table elements in a fun way. ${formatting}`;
+            default: return `${basePrompt} Answer general questions briefly and politely. ${formatting}`;
+        }
+    };
+
     const handleSend = async () => {
         if (!inputValue.trim()) return;
 
@@ -58,38 +82,54 @@ export const Astra: React.FC<AstraProps> = ({ context = 'general' }) => {
         setInputValue("");
         setIsTyping(true);
 
-        // Simulate AI Response based on Context
-        setTimeout(() => {
-            const responseText = generateResponse(userMsg.text, context);
-            const astraMsg: Message = { id: (Date.now() + 1).toString(), text: responseText, sender: 'astra' };
+        try {
+            if (!genAI) {
+                throw new Error("API Key not configured");
+            }
+
+            // Using gemini-2.0-flash as requested (verified available)
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+            // Construct history for context (last 5 messages)
+            const history = messages.slice(-5).map(m => ({
+                role: m.sender === 'user' ? 'user' : 'model',
+                parts: [{ text: m.text }]
+            }));
+
+            const chat = model.startChat({
+                history: [
+                    {
+                        role: "user",
+                        parts: [{ text: `System Instruction: ${getSystemPrompt(context)}` }],
+                    },
+                    {
+                        role: "model",
+                        parts: [{ text: "Understood. I am Astra, ready to help with " + context + "." }],
+                    },
+                    ...history
+                ],
+            });
+
+            const result = await chat.sendMessage(userMsg.text);
+            const response = await result.response;
+            const text = response.text();
+
+            const astraMsg: Message = { id: (Date.now() + 1).toString(), text: text, sender: 'astra' };
             setMessages(prev => [...prev, astraMsg]);
+
+        } catch (error) {
+            console.error("Gemini API Error:", error);
+            const errorMsg: Message = {
+                id: (Date.now() + 1).toString(),
+                text: !genAI ? "My brain link is missing (API Key). Please check configuration." : "I'm having trouble connecting to the mainframe. Please try again.",
+                sender: 'astra',
+                isError: true
+            };
+            setMessages(prev => [...prev, errorMsg]);
+        } finally {
             setIsTyping(false);
-        }, 1500);
+        }
     };
-
-    function generateResponse(input: string, ctx: AstraContext): string {
-        const lowerInput = input.toLowerCase();
-
-        if (ctx === 'physics') {
-            if (lowerInput.includes('ohm')) return "Ohm's Law (V = I × R) relates Voltage, Current, and Resistance.";
-            if (lowerInput.includes('electron')) return "Electrons are negatively charged particles that flow to create current.";
-            if (lowerInput.includes('circuit')) return "A circuit is a closed loop that allows electrons to flow.";
-        }
-
-        if (ctx === 'math') {
-            if (lowerInput.includes('sine') || lowerInput.includes('sin')) return "Sine is the ratio of the opposite side to the hypotenuse (Opposite/Hypotenuse). On the unit circle, it's the Y-coordinate.";
-            if (lowerInput.includes('cosine') || lowerInput.includes('cos')) return "Cosine is the ratio of the adjacent side to the hypotenuse (Adjacent/Hypotenuse). On the unit circle, it's the X-coordinate.";
-            if (lowerInput.includes('angle')) return "Angles measure rotation. 360 degrees make a full circle!";
-        }
-
-        if (ctx === 'chemistry') {
-            if (lowerInput.includes('water') || lowerInput.includes('h2o')) return "Water consists of one oxygen atom bonded to two hydrogen atoms. It's essential for life!";
-            if (lowerInput.includes('bond')) return "Chemical bonds hold atoms together. Covalent bonds involve sharing electrons.";
-            if (lowerInput.includes('atom')) return "Atoms are the building blocks of matter, made of protons, neutrons, and electrons.";
-        }
-
-        return "That's a great question! I'm still learning, but try asking about the specific concepts in this experiment.";
-    }
 
     return (
         <>
@@ -147,13 +187,23 @@ export const Astra: React.FC<AstraProps> = ({ context = 'general' }) => {
                                 <div
                                     key={msg.id}
                                     className={cn(
-                                        "max-w-[80%] p-3 rounded-xl text-sm font-medium border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
+                                        "max-w-[85%] p-3 rounded-xl text-sm font-medium border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
                                         msg.sender === 'user'
                                             ? "ml-auto bg-brand-blue text-white rounded-br-none"
-                                            : "mr-auto bg-gray-100 text-brand-black rounded-bl-none"
+                                            : msg.isError
+                                                ? "mr-auto bg-red-100 text-red-800 rounded-bl-none border-red-500"
+                                                : "mr-auto bg-gray-100 text-brand-black rounded-bl-none"
                                     )}
                                 >
-                                    {msg.text}
+                                    {msg.sender === 'astra' && !msg.isError ? (
+                                        <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-gray-800 prose-pre:text-white prose-pre:p-2 prose-pre:rounded-lg">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                {msg.text}
+                                            </ReactMarkdown>
+                                        </div>
+                                    ) : (
+                                        msg.text
+                                    )}
                                 </div>
                             ))}
                             {isTyping && (
@@ -179,7 +229,7 @@ export const Astra: React.FC<AstraProps> = ({ context = 'general' }) => {
                                     placeholder={`Ask about ${context}...`}
                                     className="flex-1 bg-white border-2 border-black rounded-xl px-4 py-2 text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none transition-all"
                                 />
-                                <Button type="submit" variant="primary" size="sm" className="rounded-xl px-3">
+                                <Button type="submit" variant="primary" size="sm" className="rounded-xl px-3" disabled={isTyping}>
                                     <Send className="w-4 h-4" />
                                 </Button>
                             </form>

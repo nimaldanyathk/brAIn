@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Lock, ArrowLeft } from 'lucide-react';
+import { Zap, Lock, ArrowLeft, MoveDiagonal, Scale, Activity, Battery, Globe } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 
@@ -15,6 +15,46 @@ export const PhysiX: React.FC = () => {
             icon: Zap,
             locked: false,
             path: '/physix/ohms-law',
+        },
+        {
+            id: 'vectors',
+            title: "Vector Addition",
+            description: "Visualize the Parallelogram Law of Vector Addition.",
+            icon: MoveDiagonal,
+            locked: false,
+            path: '/physix/vectors',
+        },
+        {
+            id: 'newton',
+            title: "Newton's Laws",
+            description: "Explore Inertia, F=ma, and Action-Reaction.",
+            icon: Scale,
+            locked: false,
+            path: '/physix/newton',
+        },
+        {
+            id: 'momentum',
+            title: "Conservation of Momentum",
+            description: "Simulate elastic collisions and momentum transfer.",
+            icon: Activity,
+            locked: false,
+            path: '/physix/momentum',
+        },
+        {
+            id: 'energy',
+            title: "Energy & Work",
+            description: "Understand Work-Energy Theorem and Conservation.",
+            icon: Battery,
+            locked: false,
+            path: '/physix/energy',
+        },
+        {
+            id: 'gravitation',
+            title: "Gravitation",
+            description: "Universal Law and Kepler's Planetary Motion.",
+            icon: Globe,
+            locked: false,
+            path: '/physix/gravitation',
         },
         {
             id: 'optics',

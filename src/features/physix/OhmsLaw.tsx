@@ -116,7 +116,7 @@ export const OhmsLaw: React.FC = () => {
                 <div className="lg:col-span-1 flex flex-col gap-6">
                     <Card className="bg-blue-50 border-blue-200">
                         <div className="flex flex-col items-center text-center gap-4">
-                            <Astra context="physics" size="sm" />
+                            <Astra context="physics" size="sm" topic="ohms-law" />
                             <p className="text-sm leading-relaxed text-brand-black font-bold">{astraMessage}</p>
                         </div>
                     </Card>
