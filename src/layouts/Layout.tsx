@@ -9,12 +9,12 @@ import { PomodoroTimer } from '../components/PomodoroTimer';
 export const Layout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-        const [user, setUser] = useState<any>(null);
-    
+    const [user, setUser] = useState<any>(null);
 
-    
 
-    
+
+
+
 
     useEffect(() => {
         // Check for Demo Session
@@ -92,8 +92,8 @@ export const Layout: React.FC = () => {
                     </NavLink>
                 </nav>
 
-                                {/* Full Screen Toggle */}
-                
+                {/* Full Screen Toggle */}
+
 
                 {/* User Profile */}
                 <div className="flex items-center gap-4">
@@ -126,7 +126,7 @@ export const Layout: React.FC = () => {
             {/* Main Content Area */}
             <main className={`flex-1 relative p-6 scroll-smooth ${isHome ? '' : 'overflow-y-auto'}`}>
                 <div className="h-full w-full max-w-7xl mx-auto flex flex-col">
-                    <Outlet />
+                    <Outlet context={{ user }} />
                 </div>
             </main>
 

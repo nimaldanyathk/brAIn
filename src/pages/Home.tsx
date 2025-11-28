@@ -1,5 +1,5 @@
 ﻿import React, { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Sparkles, Atom, Calculator, FlaskConical, Star, BookOpen, Users, Trophy, Train, Eye } from 'lucide-react';
 import { Card } from '../components/ui/Card';
@@ -9,6 +9,7 @@ import { IllusionGallery } from '../features/illusions/IllusionGallery';
 
 export const Home: React.FC = () => {
     const navigate = useNavigate();
+    const { user } = useOutletContext<{ user: any }>();
     const containerRef = useRef<HTMLDivElement>(null);
     const [username] = React.useState("Cadet"); // TODO: Replace with Google Login user data
     const { scrollYProgress } = useScroll({
@@ -147,7 +148,9 @@ export const Home: React.FC = () => {
                         </div>
                         <h1 className="text-5xl md:text-7xl font-display font-black mb-6 text-brand-black leading-tight">
                             Welcome back, <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-accent-green">{username}!</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-accent-green">
+                                {user?.user_metadata?.full_name || user?.email?.split('@')[0] || "Cadet"}!
+                            </span>
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-500 mb-10 leading-relaxed font-medium">
                             Your daily mission awaits. Choose a realm to continue your training.
