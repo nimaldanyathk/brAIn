@@ -196,23 +196,14 @@ export const Login: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-4">
                             <button
                                 onClick={() => handleOAuthLogin('google')}
                                 disabled={loading || !isSupabaseConfigured}
-                                className="flex items-center justify-center gap-2 bg-white text-brand-black font-bold py-3 px-4 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 bg-white text-brand-black font-bold py-3 px-4 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50"
                             >
                                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-                                Google
-                            </button>
-
-                            <button
-                                onClick={() => handleOAuthLogin('apple')}
-                                disabled={loading || !isSupabaseConfigured}
-                                className="flex items-center justify-center gap-2 bg-black text-white font-bold py-3 px-4 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50"
-                            >
-                                <img src="https://www.svgrepo.com/show/445136/apple.svg" alt="Apple" className="w-5 h-5 invert" />
-                                Apple
+                                Continue with Google
                             </button>
                         </div>
 
