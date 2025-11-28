@@ -86,13 +86,13 @@ const ElementTile = ({
                 />
             </mesh>
 
-            {/* Symbol Text */}
+                        {/* Symbol Text */}
             <Text 
-                position={[0, 0, 0.6]} 
-                fontSize={0.4} 
+                position={[0, height + 0.1, 0.2]} 
+                fontSize={0.3} 
                 color="black" 
                 anchorX="center" 
-                anchorY="middle"
+                anchorY="bottom"
                 fontWeight="bold"
             >
                 {element.symbol}
@@ -100,11 +100,11 @@ const ElementTile = ({
             
             {/* Atomic Number */}
             <Text 
-                position={[-0.35, 0.35, 0.6]} 
+                position={[-0.35, height + 0.1, -0.35]} 
                 fontSize={0.15} 
                 color="#444" 
                 anchorX="left" 
-                anchorY="top"
+                anchorY="bottom"
             >
                 {element.number}
             </Text>
@@ -213,35 +213,23 @@ export const PeriodicTable = () => {
             )}
 
                         {/* Main 3D Scene */}
-            <Canvas camera={{ position: [0, 0, 38], fov: 35 }}>
+            <Canvas camera={{ position: [0, 15, 25], fov: 45 }}>
                 <color attach="background" args={['#ffffff']} />
                 <ambientLight intensity={0.8} />
-                <pointLight position={[10, 10, 30]} intensity={1} />
-                <pointLight position={[-10, -10, 30]} intensity={0.5} />
-
-                <group position={[-10, 4, 0]}> {/* Center the table */}
+                <pointLight position={[20, 30, 20]} intensity={1.2} />
+                <pointLight position={[-20, 10, -20]} intensity={0.5} />
+                <group position={[-9, 0, 0]}> {/* Center the table roughly */}
                     {ELEMENTS.map((el) => {
-                        // Calculate 3D position (Vertical Layout)
-                        // X = Group
-                        // Y = -Period (Top to Bottom)
-                        let x = el.group * 1.2;
-                        let y = -el.period * 1.2;
-                        let z = 0;
+                        // Calculate 3D position (Flat Layout)
+                        let x = el.group * 1.1;
+                        let z = el.period * 1.1;
+                        let y = 0;
 
                         // Offset for Lanthanides/Actinides (f-block)
                         if (el.block === 'f') {
-                            // Place them below the main table
-                            // Period 6 (Lanthanides) -> visually Row 9
-                            // Period 7 (Actinides) -> visually Row 10
-                            const fRow = el.period === 6 ? 9 : 10;
-                            y = -fRow * 1.2;
-                            
-                            // Center them roughly under the main block
-                            // They start from group 3 visually in terms of X
-                            // The gap is between group 2 and 4.
-                            // Let's shift them to start around x=4
-                            const offset = (el.number >= 57 && el.number <= 71) ? (el.number - 57) : (el.number - 89);
-                            x = (3 + offset) * 1.2; 
+                            y = -3; // Drop them down slightly
+                            z += 2.5; // Push them forward/separate
+                            x = (el.number >= 57 && el.number <= 71) ? (el.number - 57) + 3 : (el.number - 89) + 3; 
                         }
 
                         return (
@@ -260,13 +248,16 @@ export const PeriodicTable = () => {
                 <OrbitControls 
                     enablePan={true} 
                     enableZoom={true}
-                    minDistance={5}
-                    maxDistance={100}
-                    target={[0, 0, 0]} 
+                    maxPolarAngle={Math.PI / 2.2} 
+                    minDistance={2}
+                    maxDistance={60}
+                    target={[9, 0, 4]} 
                 />
             </Canvas>
         </div>
     );
 };
+
+
 
 

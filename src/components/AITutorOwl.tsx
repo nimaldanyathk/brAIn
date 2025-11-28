@@ -2,7 +2,12 @@
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { X, Send, Brain, Loader2, Minimize2, Maximize2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { gemini } from '../lib/gemini';
+import remarkGfm from 'remark-gfm';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Initialize Gemini API
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 interface Message {
     role: 'user' | 'assistant';
@@ -48,24 +53,51 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
     }, [messages, isOpen]);
 
     const handleSend = async (e?: React.FormEvent) => {
-        e?.preventDefault();
+        if (e) e.preventDefault();
         if (!inputValue.trim()) return;
 
-        const userMessage = inputValue;
-        setInputValue('');
-        setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+        const userMsg: Message = { role: 'user', content: inputValue };
+        setMessages(prev => [...prev, userMsg]);
+        setInputValue("");
         setIsTyping(true);
 
         try {
-            const response = await gemini.chat(userMessage, context);
-            setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+            if (!genAI) throw new Error("API Key not configured");
+            
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            
+            // Construct history
+            const history = messages.slice(-5).map(m => ({
+                role: m.role === 'user' ? 'user' : 'model',
+                parts: [{ text: m.content }]
+            }));
+
+            const chat = model.startChat({
+                history: [
+                    {
+                        role: "user",
+                        parts: [{ text: `System Instruction: You are Professor Owl, a helpful AI tutor in a STEM lab. Context: ${context}. Answer concisely with Markdown. Start with 'Hoot!' occasionally.` }],
+                    },
+                    {
+                        role: "model",
+                        parts: [{ text: `Hoot! I am Professor Owl. I'm ready to help with ${context}.` }],
+                    },
+                    ...history
+                ],
+            });
+
+            const result = await chat.sendMessage(userMsg.content);
+            const response = await result.response;
+            const text = response.text();
+
+            setMessages(prev => [...prev, { role: 'assistant', content: text }]);
         } catch (error) {
-            setMessages(prev => [...prev, { role: 'assistant', content: "Hoot! My feathers are ruffled. I couldn't reach the library. Try again?" }]);
+            console.error("Gemini Error:", error);
+            setMessages(prev => [...prev, { role: 'assistant', content: "Hoot! My connection to the knowledge base is fuzzy. Please check your API key." }]);
         } finally {
             setIsTyping(false);
         }
     };
-
     return (
         <>
             {/* Owl Character Container - Wrapped in Scroll Transform */}
@@ -292,7 +324,7 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
                                                         : 'bg-white text-brand-black rounded-bl-none shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] border border-gray-200'
                                                 }`}
                                             >
-                                                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                                             </div>
                                         </div>
                                     ))}
@@ -333,4 +365,7 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
         </>
     );
 };
+
+
+
 

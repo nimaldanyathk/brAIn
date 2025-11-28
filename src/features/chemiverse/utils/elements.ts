@@ -23,7 +23,7 @@ const getPosition = (z: number): { group: number, period: number, block: 's' | '
     if (z >= 5 && z <= 10) return { group: z + 8, period: 2, block: 'p' };
 
     if (z >= 11 && z <= 12) return { group: z - 10, period: 3, block: 's' };
-    if (z >= 13 && z <= 18) return { group: z + 5, period: 3, block: 'p' };
+    if (z >= 13 && z <= 18) return { group: z, period: 3, block: 'p' };
 
     if (z >= 19 && z <= 20) return { group: z - 18, period: 4, block: 's' };
     if (z >= 21 && z <= 30) return { group: z - 18, period: 4, block: 'd' };
@@ -200,3 +200,4 @@ export const getOrbitals = (element: ElementData) => {
     if (element.number >= 31) orbitals.push({ type: '4p', count: Math.min(element.number - 30, 6) });
     return orbitals;
 };
+

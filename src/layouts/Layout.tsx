@@ -8,7 +8,12 @@ import { AITutorOwl } from '../components/AITutorOwl';
 export const Layout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [user, setUser] = useState<any>(null);
+        const [user, setUser] = useState<any>(null);
+    
+
+    
+
+    
 
     useEffect(() => {
         // Check for Demo Session
@@ -65,7 +70,7 @@ export const Layout: React.FC = () => {
                 {/* Navigation Links */}
                 
                 {/* Navigation Links */}
-                <nav className="hidden md:flex items-center gap-1">
+                <nav className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
                     <NavLink
                         to="/physix"
                         className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-lg font-bold border-2 transition-all text-sm ${isActive ? 'bg-blue-100 border-black text-brand-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'border-transparent text-gray-500 hover:text-brand-black hover:bg-gray-100'}`}
@@ -85,6 +90,9 @@ export const Layout: React.FC = () => {
                         <FlaskConical className="w-4 h-4" /> Chemistry
                     </NavLink>
                 </nav>
+
+                                {/* Full Screen Toggle */}
+                
 
                 {/* User Profile */}
                 <div className="flex items-center gap-4">
@@ -159,6 +167,11 @@ function getContext(path: string): 'physics' | 'math' | 'chemistry' | 'general' 
     if (path.includes('chemistry') || path.includes('chemiverse')) return 'chemistry';
     return 'general';
 }
+
+
+
+
+
 
 
 
