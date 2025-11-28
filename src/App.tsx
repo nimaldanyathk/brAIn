@@ -29,6 +29,7 @@ import { OrganicMolecules } from './features/chemiverse/OrganicMolecules';
 import { Polymers } from './features/chemiverse/Polymers';
 import { EnvironmentalChemistry } from './features/chemiverse/EnvironmentalChemistry';
 import { MoleculeViewer } from './features/chemiverse/MoleculeViewer';
+import { LearningExpress } from './features/learning-express/LearningExpress';
 
 // Protected Route Component
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
@@ -200,6 +201,12 @@ function App() {
           <Route path='chemistry/molecules' element={
             <AuthGuard>
               <MoleculeViewer />
+            </AuthGuard>
+          } />
+
+          <Route path='learning-express' element={
+            <AuthGuard>
+              <LearningExpress />
             </AuthGuard>
           } />
         </Route>

@@ -1,7 +1,7 @@
 ﻿import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Sparkles, Atom, Calculator, FlaskConical, Star, BookOpen, Users, Trophy } from 'lucide-react';
+import { ArrowRight, Sparkles, Atom, Calculator, FlaskConical, Star, BookOpen, Users, Trophy, Train } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { UltramodernButton } from '../components/ui/UltramodernButton';
 
@@ -44,6 +44,16 @@ export const Home: React.FC = () => {
             path: '/math',
             progress: 0,
         },
+        {
+            id: 'learning-express',
+            title: 'Learning Express',
+            description: 'All aboard! Solve puzzles to keep the train moving.',
+            icon: Train,
+            color: 'text-red-500',
+            bg: 'bg-red-100',
+            path: '/learning-express',
+            progress: 0,
+        },
     ];
 
     const containerVariants = {
@@ -75,8 +85,38 @@ export const Home: React.FC = () => {
 
     return (
         <div ref={containerRef} className="relative min-h-[200vh] pb-20 overflow-hidden">
-            {/* Continuous Tree Visual - Now Absolute and Tall */}
-            
+            {/* Live White-Themed Background */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-surface-gray">
+                {/* Subtle Grid */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+                
+                {/* Floating Geometric Shapes */}
+                {[...Array(15)].map((_, i) => (
+                    <motion.div
+                        key={i}
+                        className="absolute border-2 border-brand-blue/10 rounded-xl"
+                        style={{
+                            width: Math.random() * 40 + 20,
+                            height: Math.random() * 40 + 20,
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            borderRadius: Math.random() > 0.5 ? "50%" : "12px",
+                        }}
+                        animate={{
+                            y: [0, -40, 0],
+                            x: [0, Math.random() * 30 - 15, 0],
+                            rotate: [0, 360],
+                            opacity: [0.3, 0.6, 0.3],
+                        }}
+                        transition={{
+                            duration: Math.random() * 10 + 15,
+                            repeat: Infinity,
+                            ease: "linear",
+                        }}
+                    />
+                ))}
+            </div>
+
             {/* Continuous Birch Tree Visual */}
             <div className="absolute top-0 right-0 w-64 pointer-events-none z-0 hidden md:block" style={{ height: '300vh' }}>
                 <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 200 3000">
@@ -113,42 +153,6 @@ export const Home: React.FC = () => {
                     <circle cx="200" cy="800" r="12" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="2" />
                 </svg>
             </div>
-
-
-            {/* Animated Background Particles */}
-            
-            {/* Live White-Themed Background */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-surface-gray">
-                {/* Subtle Grid */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-                
-                {/* Floating Geometric Shapes */}
-                {[...Array(15)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute border-2 border-brand-blue/10 rounded-xl"
-                        style={{
-                            width: Math.random() * 40 + 20,
-                            height: Math.random() * 40 + 20,
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            borderRadius: Math.random() > 0.5 ? "50%" : "12px",
-                        }}
-                        animate={{
-                            y: [0, -40, 0],
-                            x: [0, Math.random() * 30 - 15, 0],
-                            rotate: [0, 360],
-                            opacity: [0.3, 0.6, 0.3],
-                        }}
-                        transition={{
-                            duration: Math.random() * 10 + 15,
-                            repeat: Infinity,
-                            ease: "linear",
-                        }}
-                    />
-                ))}
-            </div>
-
 
             {/* Hero Section with Parallax & Scroll Mask */}
             <section className="relative h-[100vh] flex items-center justify-center sticky top-0">
@@ -282,4 +286,3 @@ export const Home: React.FC = () => {
         </div>
     );
 };
-
