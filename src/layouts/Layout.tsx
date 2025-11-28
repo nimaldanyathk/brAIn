@@ -41,8 +41,10 @@ export const Layout: React.FC = () => {
         navigate('/login');
     };
 
+        const isHome = location.pathname === '/';
+
     return (
-        <div className="flex flex-col min-h-screen bg-surface-gray font-sans text-brand-black selection:bg-brand-blue selection:text-white">
+        <div className={`flex flex-col bg-surface-gray font-sans text-brand-black selection:bg-brand-blue selection:text-white ${isHome ? 'min-h-screen' : 'h-screen overflow-hidden'}`}>
             {/* Top Navigation Bar */}
             <header className="h-16 bg-white border-b-2 border-black flex items-center justify-between px-6 shrink-0 z-50">
                 {/* Logo */}
@@ -113,7 +115,7 @@ export const Layout: React.FC = () => {
             </header>
 
             {/* Main Content Area */}
-            <main className="flex-1 relative p-6 scroll-smooth">
+            <main className={`flex-1 relative p-6 scroll-smooth ${isHome ? '' : 'overflow-y-auto'}`}>
                 <div className="h-full w-full max-w-7xl mx-auto flex flex-col">
                     <Outlet />
                 </div>
@@ -157,6 +159,8 @@ function getContext(path: string): 'physics' | 'math' | 'chemistry' | 'general' 
     if (path.includes('chemistry') || path.includes('chemiverse')) return 'chemistry';
     return 'general';
 }
+
+
 
 
 
