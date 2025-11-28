@@ -1,371 +1,239 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { X, Send, Brain, Loader2, Minimize2, Maximize2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Send, Sparkles } from 'lucide-react';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Button } from './ui/Button';
+import { cn } from '../lib/utils';
 
 // Initialize Gemini API
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
+export type AITutorOwlEmotion = 'idle' | 'happy' | 'thinking' | 'warning';
+export type AITutorOwlContext = 'physics' | 'math' | 'chemistry' | 'general';
+
 interface Message {
-    role: 'user' | 'assistant';
-    content: string;
+    id: string;
+    text: string;
+    sender: 'user' | 'astra';
+    isError?: boolean;
 }
 
 interface AITutorOwlProps {
-    context?: 'physics' | 'math' | 'chemistry' | 'general';
+    emotion?: AITutorOwlEmotion;
+    size?: 'sm' | 'md' | 'lg';
+    context?: AITutorOwlContext;
 }
 
 export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    const [blink, setBlink] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    const [isMinimized, setIsMinimized] = useState(false);
-    const [hasLanded, setHasLanded] = useState(false);
-    const [messages, setMessages] = useState<Message[]>([
-        { role: 'assistant', content: `Hoot! I'm Professor Owl. Ask me anything about ${context}!` }
-    ]);
-    const [inputValue, setInputValue] = useState('');
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [inputValue, setInputValue] = useState("");
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Scroll Logic for "Scroll Mask" effect
-    const { scrollY } = useScroll();
-    // Move up as we scroll down. 
-    // At scrollY=0, y=0. At scrollY=500, y=-500.
-    // This makes the fixed element behave like it's absolute positioned at the top.
-    const scrollYPos = useTransform(scrollY, [0, 1000], [0, -1000]);
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
 
-    // Blinking logic
     useEffect(() => {
-        const blinkInterval = setInterval(() => {
-            setBlink(true);
-            setTimeout(() => setBlink(false), 200);
-        }, 4000);
-        return () => clearInterval(blinkInterval);
-    }, []);
+        scrollToBottom();
+    }, [messages, isOpen, isTyping]);
 
-    // Auto-scroll to bottom of chat
+    // Reset greeting when context changes
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, isOpen]);
+        setMessages([{
+            id: Date.now().toString(),
+            text: getGreeting(context),
+            sender: 'astra'
+        }]);
+    }, [context]);
 
-    const handleSend = async (e?: React.FormEvent) => {
-        if (e) e.preventDefault();
+    function getGreeting(ctx: AITutorOwlContext) {
+        switch (ctx) {
+            case 'physics': return "Ready to explore the laws of the universe? Ask me about forces, energy, or circuits!";
+            case 'math': return "Mathematics is the language of nature. Need help with angles or equations?";
+            case 'chemistry': return "Welcome to the molecular level! Ask me about atoms, bonds, or elements.";
+            default: return "Hello Cadet! I'm Astra. How can I help you today?";
+        }
+    }
+
+    const getSystemPrompt = (ctx: AITutorOwlContext) => {
+        const basePrompt = "You are Astra, a helpful, enthusiastic AI tutor for students in a virtual STEM lab called 'brAIn'.";
+        const formatting = "Use Markdown for formatting. Use bold for key terms. Use bullet points for lists. Keep answers concise (under 3 sentences) unless asked for detail.";
+
+        switch (ctx) {
+            case 'physics': return `${basePrompt} You specialize in Physics. Explain concepts using real-world examples (gravity, forces, electricity). ${formatting}`;
+            case 'math': return `${basePrompt} You specialize in Mathematics. Help solve problems step-by-step and explain the logic clearly. Use LaTeX formatting for equations where necessary. ${formatting}`;
+            case 'chemistry': return `${basePrompt} You specialize in Chemistry. Explain molecular structures, reactions, and periodic table elements in a fun way. ${formatting}`;
+            default: return `${basePrompt} Answer general questions briefly and politely. ${formatting}`;
+        }
+    };
+
+    const handleSend = async () => {
         if (!inputValue.trim()) return;
 
-        const userMsg: Message = { role: 'user', content: inputValue };
+        const userMsg: Message = { id: Date.now().toString(), text: inputValue, sender: 'user' };
         setMessages(prev => [...prev, userMsg]);
         setInputValue("");
         setIsTyping(true);
 
         try {
-            if (!genAI) throw new Error("API Key not configured");
-            
+            if (!genAI) {
+                throw new Error("API Key not configured");
+            }
+
             const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-            
-            // Construct history
+
+            // Construct history for context (last 5 messages)
             const history = messages.slice(-5).map(m => ({
-                role: m.role === 'user' ? 'user' : 'model',
-                parts: [{ text: m.content }]
+                role: m.sender === 'user' ? 'user' : 'model',
+                parts: [{ text: m.text }]
             }));
 
             const chat = model.startChat({
                 history: [
                     {
                         role: "user",
-                        parts: [{ text: `System Instruction: You are Professor Owl, a helpful AI tutor in a STEM lab. Context: ${context}. Answer concisely with Markdown. Start with 'Hoot!' occasionally.` }],
+                        parts: [{ text: `System Instruction: ${getSystemPrompt(context)}` }],
                     },
                     {
                         role: "model",
-                        parts: [{ text: `Hoot! I am Professor Owl. I'm ready to help with ${context}.` }],
+                        parts: [{ text: "Understood. I am Astra, ready to help with " + context + "." }],
                     },
                     ...history
                 ],
             });
 
-            const result = await chat.sendMessage(userMsg.content);
+            const result = await chat.sendMessage(userMsg.text);
             const response = await result.response;
             const text = response.text();
 
-            setMessages(prev => [...prev, { role: 'assistant', content: text }]);
+            const astraMsg: Message = { id: (Date.now() + 1).toString(), text: text, sender: 'astra' };
+            setMessages(prev => [...prev, astraMsg]);
+
         } catch (error) {
-            console.error("Gemini Error:", error);
-            setMessages(prev => [...prev, { role: 'assistant', content: "Hoot! My connection to the knowledge base is fuzzy. Please check your API key." }]);
+            console.error("Gemini API Error:", error);
+            const errorMsg: Message = {
+                id: (Date.now() + 1).toString(),
+                text: !genAI ? "My brain link is missing (API Key). Please check configuration." : "I'm having trouble connecting to the mainframe. Please try again.",
+                sender: 'astra',
+                isError: true
+            };
+            setMessages(prev => [...prev, errorMsg]);
         } finally {
             setIsTyping(false);
         }
     };
+
     return (
         <>
-            {/* Owl Character Container - Wrapped in Scroll Transform */}
+            {/* Floating Trigger */}
             <motion.div
-                style={{ y: isOpen ? 0 : scrollYPos }} // Only scroll away if chat is CLOSED
-                className={`fixed bottom-0 right-0 z-50 pointer-events-none ${isOpen && !isMinimized ? 'hidden' : 'block'}`}
+                className="fixed bottom-8 right-8 z-50"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                whileHover={{ scale: 1.1 }}
             >
-                <motion.div
-                    initial={{ x: -window.innerWidth, y: -200, scale: 0.5 }}
-                    animate={{ 
-                        x: 0, 
-                        y: 0, 
-                        scale: 1,
-                        transition: { 
-                            type: "spring", 
-                            stiffness: 40, 
-                            damping: 15, 
-                            mass: 1,
-                            duration: 2.5
-                        }
-                    }}
-                    onAnimationComplete={() => setHasLanded(true)}
+                <button
+                    className={cn(
+                        "w-16 h-16 bg-brand-black text-white rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
+                        isOpen && "hidden"
+                    )}
+                    onClick={() => setIsOpen(true)}
                 >
-                    {/* Flight Path Animation Wrapper */}
-                    <motion.div
-                        animate={{
-                            y: hasLanded ? 0 : [0, -20, 0, -15, 0],
-                            rotate: hasLanded ? 0 : [0, 5, -5, 2, 0]
-                        }}
-                        transition={{
-                            duration: 2,
-                            repeat: hasLanded ? 0 : Infinity,
-                            ease: "easeInOut"
-                        }}
-                    >
-                        <div 
-                            className="relative w-48 h-48 sm:w-64 sm:h-64 pointer-events-auto cursor-pointer"
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
-                            onClick={() => setIsOpen(true)}
-                        >
-                            <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-xl">
-                                {/* Tree Branch (Only visible when landed or near end) */}
-                                <motion.path
-                                    d="M200 180 C 150 180, 100 170, 50 190"
-                                    stroke="#4b5563"
-                                    strokeWidth="4"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    initial={{ pathLength: 0, opacity: 0 }}
-                                    animate={{ pathLength: 1, opacity: 1 }}
-                                    transition={{ duration: 1, delay: 2 }}
-                                />
-                                
-                                {/* Owl Group */}
-                                <motion.g
-                                    initial={{ y: -50 }}
-                                    animate={{ y: 0 }}
-                                    transition={{ type: "spring", bounce: 0.5, delay: 2.2 }}
-                                >
-                                    {/* Body */}
-                                    <motion.ellipse 
-                                        cx="100" cy="100" rx="40" ry="50" 
-                                        fill="white" stroke="#111827" strokeWidth="3"
-                                        animate={{ 
-                                            ry: isHovered ? 52 : 50,
-                                            rotate: isHovered ? [0, -2, 2, 0] : 0 
-                                        }}
-                                    />
-                                    
-                                    {/* Belly Feathers */}
-                                    <path d="M80 110 Q100 120 120 110" fill="none" stroke="#e5e7eb" strokeWidth="2" />
-                                    <path d="M85 120 Q100 130 115 120" fill="none" stroke="#e5e7eb" strokeWidth="2" />
-                                    <path d="M90 130 Q100 135 110 130" fill="none" stroke="#e5e7eb" strokeWidth="2" />
-
-                                    {/* Wings (Flapping during flight) */}
-                                    <motion.path 
-                                        d="M60 100 Q 40 120 60 140" 
-                                        fill="white" stroke="#111827" strokeWidth="3"
-                                        animate={{ 
-                                            d: !hasLanded 
-                                                ? ["M60 100 Q 20 80 60 60", "M60 100 Q 40 120 60 140"] 
-                                                : isHovered ? "M60 90 Q 30 110 60 130" : "M60 100 Q 40 120 60 140" 
-                                        }}
-                                        transition={{
-                                            duration: !hasLanded ? 0.3 : 0.5,
-                                            repeat: !hasLanded ? Infinity : 0,
-                                            repeatType: "reverse"
-                                        }}
-                                    />
-                                    <motion.path 
-                                        d="M140 100 Q 160 120 140 140" 
-                                        fill="white" stroke="#111827" strokeWidth="3"
-                                        animate={{ 
-                                            d: !hasLanded 
-                                                ? ["M140 100 Q 180 80 140 60", "M140 100 Q 160 120 140 140"] 
-                                                : isHovered ? "M140 90 Q 170 110 140 130" : "M140 100 Q 160 120 140 140" 
-                                        }}
-                                        transition={{
-                                            duration: !hasLanded ? 0.3 : 0.5,
-                                            repeat: !hasLanded ? Infinity : 0,
-                                            repeatType: "reverse"
-                                        }}
-                                    />
-
-                                    {/* Head/Face */}
-                                    <circle cx="85" cy="80" r="12" fill="white" stroke="#111827" strokeWidth="2" />
-                                    <circle cx="115" cy="80" r="12" fill="white" stroke="#111827" strokeWidth="2" />
-                                    
-                                    {/* Eyes (Pupils) */}
-                                    <motion.circle 
-                                        cx="85" cy="80" r="4" fill="#111827" 
-                                        animate={{ scaleY: blink ? 0.1 : 1 }}
-                                    />
-                                    <motion.circle 
-                                        cx="115" cy="80" r="4" fill="#111827" 
-                                        animate={{ scaleY: blink ? 0.1 : 1 }}
-                                    />
-
-                                    {/* Glasses */}
-                                    <path d="M73 80 A 12 12 0 1 1 97 80" fill="none" stroke="#111827" strokeWidth="1" />
-                                    <path d="M103 80 A 12 12 0 1 1 127 80" fill="none" stroke="#111827" strokeWidth="1" />
-                                    <line x1="97" y1="80" x2="103" y2="80" stroke="#111827" strokeWidth="1" />
-
-                                    {/* Beak */}
-                                    <path d="M100 90 L 95 98 L 105 98 Z" fill="#fbbf24" stroke="#111827" strokeWidth="1" />
-
-                                    {/* Graduation Cap (Professor Look) */}
-                                    <motion.g
-                                        animate={{ rotate: isHovered ? 5 : 0 }}
-                                        style={{ originX: "100px", originY: "60px" }}
-                                    >
-                                        <path d="M70 60 L 100 45 L 130 60 L 100 75 Z" fill="#111827" stroke="#111827" strokeWidth="2" />
-                                        <path d="M130 60 L 130 70" fill="none" stroke="#fbbf24" strokeWidth="2" />
-                                        <circle cx="130" cy="72" r="2" fill="#fbbf24" />
-                                    </motion.g>
-
-                                    
-                                    {/* Legs/Talons */}
-                                    <path d="M90 145 L 90 155 L 85 160" fill="none" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" />
-                                    <path d="M90 155 L 95 160" fill="none" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" />
-                                    <path d="M110 145 L 110 155 L 105 160" fill="none" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" />
-                                    <path d="M110 155 L 115 160" fill="none" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" />
-
-                                    {/* Book */}
-                                    <motion.g transform="translate(120, 120) scale(0.6)">
-                                        <rect x="0" y="0" width="30" height="40" fill="#3b82f6" stroke="#111827" strokeWidth="2" />
-                                        <path d="M5 5 L 25 5" stroke="white" strokeWidth="2" />
-                                        <path d="M5 15 L 25 15" stroke="white" strokeWidth="2" />
-                                    </motion.g>
-                                </motion.g>
-                                
-                                {/* Speech Bubble (On Hover) */}
-                                <motion.g
-                                    initial={{ opacity: 0, scale: 0 }}
-                                    animate={{ opacity: isHovered && hasLanded ? 1 : 0, scale: isHovered && hasLanded ? 1 : 0 }}
-                                    transition={{ type: "spring" }}
-                                >
-                                    <path d="M140 50 Q 140 20 170 20 L 190 20 Q 200 20 200 30 L 200 60 Q 200 70 190 70 L 160 70 L 140 80 Z" fill="white" stroke="#111827" strokeWidth="2" />
-                                    <text x="155" y="50" fontSize="10" fontFamily="sans-serif" fill="#111827">Hoot! Click</text>
-                                    <text x="155" y="62" fontSize="10" fontFamily="sans-serif" fill="#111827">to chat!</text>
-                                </motion.g>
-                            </svg>
-                        </div>
-                    </motion.div>
-                </motion.div>
+                    <div className="relative">
+                        <Sparkles className="w-8 h-8 animate-pulse" />
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-black" />
+                    </div>
+                </button>
             </motion.div>
 
-            {/* Chat Interface (Expanded) */}
+            {/* Chat Window */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 100, scale: 0.9 }}
-                        animate={{ 
-                            opacity: 1, 
-                            y: 0, 
-                            scale: 1,
-                            height: isMinimized ? 'auto' : '600px',
-                            width: isMinimized ? '300px' : '400px'
-                        }}
-                        exit={{ opacity: 0, y: 100, scale: 0.9 }}
-                        className="fixed bottom-4 right-4 z-50 bg-white rounded-2xl shadow-2xl border-2 border-black flex flex-col overflow-hidden"
+                        initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                        className="fixed bottom-8 right-8 z-50 w-96 h-[500px] flex flex-col bg-white border-2 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
                     >
                         {/* Header */}
-                        <div className="bg-brand-black text-white p-4 flex items-center justify-between shrink-0">
+                        <div className="p-4 border-b-2 border-black flex items-center justify-between bg-gray-50">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-black">
-                                    <Brain className="w-5 h-5 text-brand-black" />
+                                <div className="w-10 h-10 rounded-full bg-brand-black flex items-center justify-center text-white border-2 border-black">
+                                    <Sparkles className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-sm">Professor Owl</h3>
-                                    <p className="text-xs text-gray-400 capitalize">{context} Tutor</p>
+                                    <h3 className="font-black text-brand-black">Astra AI</h3>
+                                    <p className="text-xs text-brand-blue font-bold flex items-center gap-1 uppercase tracking-wider">
+                                        <span className="w-2 h-2 bg-green-400 rounded-full border border-black animate-pulse" /> Online
+                                    </p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <button 
-                                    onClick={() => setIsMinimized(!isMinimized)}
-                                    className="p-1 hover:bg-gray-800 rounded transition-colors"
-                                >
-                                    {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
-                                </button>
-                                <button 
-                                    onClick={() => setIsOpen(false)}
-                                    className="p-1 hover:bg-red-500 rounded transition-colors"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            </div>
+                            <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
+                                <X className="w-5 h-5" />
+                            </Button>
                         </div>
 
-                        {/* Chat Area */}
-                        {!isMinimized && (
-                            <>
-                                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-                                    {messages.map((msg, idx) => (
-                                        <div
-                                            key={idx}
-                                            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                                        >
-                                            <div
-                                                className={`max-w-[80%] p-3 rounded-xl text-sm ${
-                                                    msg.role === 'user'
-                                                        ? 'bg-brand-blue text-white rounded-br-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] border-2 border-black'
-                                                        : 'bg-white text-brand-black rounded-bl-none shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] border border-gray-200'
-                                                }`}
-                                            >
-                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {isTyping && (
-                                        <div className="flex justify-start">
-                                            <div className="bg-white p-3 rounded-xl rounded-bl-none shadow-sm border border-gray-200">
-                                                <Loader2 className="w-4 h-4 animate-spin text-brand-blue" />
-                                            </div>
-                                        </div>
+                        {/* Messages */}
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
+                            {messages.map((msg) => (
+                                <div
+                                    key={msg.id}
+                                    className={cn(
+                                        "max-w-[85%] p-3 rounded-xl text-sm font-medium border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
+                                        msg.sender === 'user'
+                                            ? "ml-auto bg-brand-blue text-white rounded-br-none"
+                                            : msg.isError
+                                                ? "mr-auto bg-red-100 text-red-800 rounded-bl-none border-red-500"
+                                                : "mr-auto bg-gray-100 text-brand-black rounded-bl-none"
                                     )}
-                                    <div ref={messagesEndRef} />
+                                >
+                                    {msg.sender === 'astra' && !msg.isError ? (
+                                        <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-gray-800 prose-pre:text-white prose-pre:p-2 prose-pre:rounded-lg">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                {msg.text}
+                                            </ReactMarkdown>
+                                        </div>
+                                    ) : (
+                                        msg.text
+                                    )}
                                 </div>
+                            ))}
+                            {isTyping && (
+                                <div className="mr-auto bg-gray-100 p-3 rounded-xl rounded-bl-none border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex gap-1">
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
+                                </div>
+                            )}
+                            <div ref={messagesEndRef} />
+                        </div>
 
-                                {/* Input Area */}
-                                <div className="p-4 bg-white border-t-2 border-black">
-                                    <form onSubmit={handleSend} className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={inputValue}
-                                            onChange={(e) => setInputValue(e.target.value)}
-                                            placeholder={`Ask about ${context}...`}
-                                            className="flex-1 bg-gray-100 border-2 border-transparent focus:border-brand-blue rounded-xl px-4 py-2 text-sm font-medium focus:outline-none transition-all"
-                                        />
-                                        <button 
-                                            type="submit" 
-                                            disabled={isTyping || !inputValue.trim()}
-                                            className="bg-brand-black text-white p-2 rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                        >
-                                            <Send className="w-4 h-4" />
-                                        </button>
-                                    </form>
-                                </div>
-                            </>
-                        )}
+                        {/* Input */}
+                        <div className="p-4 bg-gray-50 border-t-2 border-black">
+                            <form
+                                onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+                                className="flex gap-2"
+                            >
+                                <input
+                                    type="text"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    placeholder={`Ask about ${context}...`}
+                                    className="flex-1 bg-white border-2 border-black rounded-xl px-4 py-2 text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none transition-all"
+                                />
+                                <Button type="submit" variant="primary" size="sm" className="rounded-xl px-3" disabled={isTyping}>
+                                    <Send className="w-4 h-4" />
+                                </Button>
+                            </form>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
         </>
     );
 };
-
-
-
-

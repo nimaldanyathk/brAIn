@@ -44,6 +44,7 @@ export const Home: React.FC = () => {
             path: '/math',
             progress: 0,
         },
+
         {
             id: 'learning-express',
             title: 'Learning Express',
@@ -89,7 +90,7 @@ export const Home: React.FC = () => {
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-surface-gray">
                 {/* Subtle Grid */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-                
+
                 {/* Floating Geometric Shapes */}
                 {[...Array(15)].map((_, i) => (
                     <motion.div
@@ -129,7 +130,7 @@ export const Home: React.FC = () => {
                             <path d="M0 35 Q 8 38, 12 35" stroke="#374151" strokeWidth="1" fill="none" opacity="0.3" />
                         </pattern>
                     </defs>
-                    
+
                     {/* Main Trunk */}
                     <motion.path
                         d="M 200 800 Q 160 1000, 180 1400 T 170 2000 T 190 2800"
@@ -148,7 +149,7 @@ export const Home: React.FC = () => {
                         strokeLinecap="round"
                         className="-z-10"
                     />
-                    
+
                     {/* Branch connection point */}
                     <circle cx="200" cy="800" r="12" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="2" />
                 </svg>
@@ -163,7 +164,7 @@ export const Home: React.FC = () => {
                     <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent-green/10 rounded-full blur-3xl animate-pulse delay-700" />
                 </div>
 
-                <motion.div 
+                <motion.div
                     className="relative z-10 text-center max-w-4xl px-6"
                     style={{ opacity: maskOpacity, y: maskY }}
                 >
@@ -199,7 +200,7 @@ export const Home: React.FC = () => {
 
             {/* Content Sections for Scrolling */}
             <div className="relative z-20 bg-white/80 backdrop-blur-sm pt-20 pb-40 border-t-2 border-black/5">
-                
+
                 {/* Realms Grid */}
                 <section className="max-w-6xl mx-auto px-6 mb-32">
                     <div className="flex items-center gap-4 mb-12">

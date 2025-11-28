@@ -1,134 +1,341 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calculator } from 'lucide-react';
+import {
+    TrendingUp,
+    Dices,
+    Sigma,
+    GitGraph,
+    Infinity,
+    Grid,
+    Box,
+    ArrowLeft,
+    Coins,
+    Layers
+} from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Slider } from '../components/ui/Slider';
 
-
-export const MathOdyssey: React.FC = () => {
-    const navigate = useNavigate();
+// Trigonometry Module Component
+const TrigonometryModule = () => {
     const [angle, setAngle] = useState(45);
-    const [sin, setSin] = useState(0);
-    const [cos, setCos] = useState(0);
-    const [tan, setTan] = useState(0);
 
-    useEffect(() => {
-        const rad = (angle * Math.PI) / 180;
-        setSin(parseFloat(Math.sin(rad).toFixed(3)));
-        setCos(parseFloat(Math.cos(rad).toFixed(3)));
-        setTan(parseFloat(Math.tan(rad).toFixed(3)));
-    }, [angle]);
-
-    // Calculate coordinates for the unit circle point
-    const radius = 120;
-    const cx = 150;
-    const cy = 150;
-    const x = cx + radius * Math.cos((angle * Math.PI) / 180);
-    const y = cy - radius * Math.sin((angle * Math.PI) / 180); // SVG y is inverted
+    const radians = (angle * Math.PI) / 180;
+    const x = Math.cos(radians);
+    const y = Math.sin(radians);
 
     return (
         <div className="h-full flex flex-col gap-6">
-            {/* Header */}
             <div className="flex items-center gap-4 shrink-0">
-                <Button variant="ghost" onClick={() => navigate('/')} className="px-2">
+                <Button variant="ghost" onClick={() => window.location.reload()} className="px-2">
                     <ArrowLeft className="w-6 h-6" />
                 </Button>
                 <div>
-                    <h1 className="text-3xl font-display font-black text-brand-black">Math Odyssey</h1>
-                    <p className="text-sm text-gray-500 font-bold">Trigonometry & The Unit Circle</p>
+                    <h1 className="text-3xl font-display font-black text-brand-black">Trigonometry</h1>
+                    <p className="text-sm text-gray-500 font-bold">The Unit Circle</p>
                 </div>
             </div>
 
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
-                {/* Left Panel: Controls & Info */}
                 <div className="lg:col-span-1 flex flex-col gap-6">
-                    <Card className="bg-yellow-50 border-yellow-200">
+                    <Card className="bg-blue-50 border-blue-200">
                         <div className="flex flex-col items-center text-center gap-4">
-                            
+                            <TrendingUp className="w-12 h-12 text-blue-500" />
                             <p className="text-sm leading-relaxed text-brand-black font-bold">
-                                "The Unit Circle connects angles to coordinates! Watch how Sine (height) and Cosine (width) change."
+                                "The unit circle relates angles to coordinates. Cosine is x, Sine is y."
                             </p>
                         </div>
                     </Card>
 
-                    <Card className="flex-1 space-y-8">
+                    <Card className="flex-1 space-y-6">
                         <div>
-                            <h2 className="text-lg font-black text-brand-black flex items-center gap-2 mb-4">
-                                <Calculator className="w-5 h-5 text-yellow-600" />
-                                Controls
-                            </h2>
+                            <h3 className="font-black text-brand-black mb-4">Controls</h3>
                             <Slider
-                                label="Angle (Degrees)"
+                                label="Angle (degrees)"
                                 value={angle}
                                 min={0}
                                 max={360}
-                                unit="Â°"
-                                color="red"
+                                step={1}
                                 onChange={setAngle}
+                                color="blue"
                             />
                         </div>
 
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center p-3 bg-red-50 rounded-xl border-2 border-red-100">
-                                <span className="font-bold text-red-600">Sine (sin)</span>
-                                <span className="font-mono font-black text-xl">{sin}</span>
+                        <div className="bg-gray-100 p-4 rounded-xl space-y-2 border-2 border-gray-200">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-500 font-bold">Angle (rad):</span>
+                                <span className="font-mono font-black text-brand-black">{radians.toFixed(2)}π</span>
                             </div>
-                            <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl border-2 border-blue-100">
-                                <span className="font-bold text-blue-600">Cosine (cos)</span>
-                                <span className="font-mono font-black text-xl">{cos}</span>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-500 font-bold">Cos(θ):</span>
+                                <span className="font-mono font-black text-blue-600">{x.toFixed(3)}</span>
                             </div>
-                            <div className="flex justify-between items-center p-3 bg-green-50 rounded-xl border-2 border-green-100">
-                                <span className="font-bold text-green-600">Tangent (tan)</span>
-                                <span className="font-mono font-black text-xl">{tan}</span>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-500 font-bold">Sin(θ):</span>
+                                <span className="font-mono font-black text-red-600">{y.toFixed(3)}</span>
                             </div>
                         </div>
                     </Card>
                 </div>
 
-                {/* Right Panel: Visualization */}
-                <div className="lg:col-span-2 h-[500px] lg:h-auto">
-                    <Card className="h-full flex items-center justify-center bg-white relative overflow-hidden">
-                        <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-30" />
+                <div className="lg:col-span-2 h-[500px] lg:h-auto rounded-2xl overflow-hidden border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white relative flex items-center justify-center p-8">
+                    {/* SVG Visualization */}
+                    <svg viewBox="0 0 400 300" className="w-full h-full">
+                        {/* Grid */}
+                        <defs>
+                            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" strokeWidth="1" />
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)" />
 
-                        <svg width="300" height="300" viewBox="0 0 300 300" className="z-10 overflow-visible">
-                            {/* Axes */}
-                            <line x1="0" y1="150" x2="300" y2="150" stroke="#d1d5db" strokeWidth="2" />
-                            <line x1="150" y1="0" x2="150" y2="300" stroke="#d1d5db" strokeWidth="2" />
+                        {/* Axes */}
+                        <line x1="20" y1="150" x2="380" y2="150" stroke="#94a3b8" strokeWidth="2" />
+                        <line x1="200" y1="20" x2="200" y2="280" stroke="#94a3b8" strokeWidth="2" />
 
-                            {/* Unit Circle */}
-                            <circle cx="150" cy="150" r="120" fill="none" stroke="#1d1d1f" strokeWidth="3" />
+                        {/* Unit Circle (Radius 100px) */}
+                        <circle cx="200" cy="150" r="100" fill="none" stroke="#cbd5e1" strokeWidth="2" />
 
-                            {/* Angle Arc */}
-                            <path
-                                d={`M 180 150 A 30 30 0 ${angle > 180 ? 1 : 0} 0 ${150 + 30 * Math.cos((angle * Math.PI) / -180)} ${150 + 30 * Math.sin((angle * Math.PI) / -180)}`}
-                                fill="none"
-                                stroke="#eab308"
-                                strokeWidth="2"
-                                strokeDasharray="4 2"
-                            />
-                            <text x="190" y="140" className="text-xs font-bold fill-yellow-600">{angle}Â°</text>
+                        {/* Angle Arc */}
+                        <path
+                            d={`M 230 150 A 30 30 0 ${angle > 180 ? 1 : 0} 0 ${200 + 30 * Math.cos(-radians)} ${150 + 30 * Math.sin(-radians)}`}
+                            fill="none"
+                            stroke="#f59e0b"
+                            strokeWidth="2"
+                        />
 
-                            {/* Radius Line */}
-                            <line x1="150" y1="150" x2={x} y2={y} stroke="#1d1d1f" strokeWidth="2" />
+                        {/* Triangle Lines */}
+                        <line x1="200" y1="150" x2={200 + x * 100} y2={150} stroke="#2563eb" strokeWidth="3" /> {/* Cos */}
+                        <line x1={200 + x * 100} y1={150} x2={200 + x * 100} y2={150 - y * 100} stroke="#dc2626" strokeWidth="3" /> {/* Sin */}
+                        <line x1="200" y1="150" x2={200 + x * 100} y2={150 - y * 100} stroke="#000" strokeWidth="2" /> {/* Hypotenuse */}
 
-                            {/* Cosine Line (Blue) */}
-                            <line x1="150" y1="150" x2={x} y2="150" stroke="#2563eb" strokeWidth="4" strokeLinecap="round" />
+                        {/* Point */}
+                        <circle cx={200 + x * 100} cy={150 - y * 100} r="6" fill="#000" />
 
-                            {/* Sine Line (Red) */}
-                            <line x1={x} y1="150" x2={x} y2={y} stroke="#dc2626" strokeWidth="4" strokeLinecap="round" />
-
-                            {/* Point */}
-                            <circle cx={x} cy={y} r="6" fill="#1d1d1f" stroke="white" strokeWidth="2" />
-
-                            {/* Labels */}
-                            <text x={150 + (x - 150) / 2} y="170" className="text-xs font-bold fill-blue-600 text-center" textAnchor="middle">cos</text>
-                            <text x={x + 10} y={150 + (y - 150) / 2} className="text-xs font-bold fill-red-600" alignmentBaseline="middle">sin</text>
-                        </svg>
-                    </Card>
+                        {/* Labels */}
+                        <text x={200 + x * 50} y={170} textAnchor="middle" fill="#2563eb" fontWeight="bold">cos</text>
+                        <text x={200 + x * 100 + 10} y={150 - y * 50} fill="#dc2626" fontWeight="bold">sin</text>
+                    </svg>
                 </div>
             </div>
         </div>
     );
 };
 
+interface Topic {
+    id: string;
+    title: string;
+    description: string;
+    icon: any;
+    color: string;
+    bg: string;
+    path?: string;
+    action?: () => void;
+    disabled?: boolean;
+}
+
+export const MathOdyssey: React.FC = () => {
+    const navigate = useNavigate();
+    const [activeModule, setActiveModule] = useState<'hub' | 'trig'>('hub');
+    const [activeTab, setActiveTab] = useState<'class11' | 'class12'>('class11');
+
+    const topics: { [key: string]: Topic[] } = {
+        class11: [
+            {
+                id: 'sets',
+                title: 'Sets & Venn Diagrams',
+                description: 'Visualize set operations with 3D intersecting spheres.',
+                icon: Layers,
+                color: 'text-indigo-600',
+                bg: 'bg-indigo-100',
+                path: '/math/sets',
+                disabled: false
+            },
+            {
+                id: 'relations',
+                title: 'Relations & Functions',
+                description: 'Map domains to ranges with interactive draggable curves.',
+                icon: GitGraph,
+                color: 'text-cyan-600',
+                bg: 'bg-cyan-100',
+                path: '/math/relations',
+                disabled: false
+            },
+            {
+                id: 'trig',
+                title: 'Trigonometric Functions',
+                description: 'Master the Unit Circle and rotating 3D graphs.',
+                icon: TrendingUp,
+                color: 'text-blue-600',
+                bg: 'bg-blue-100',
+                action: () => setActiveModule('trig'),
+                disabled: false
+            },
+            {
+                id: 'complex',
+                title: 'Complex Numbers',
+                description: 'Explore the Argand plane with animated 3D visuals.',
+                icon: Infinity,
+                color: 'text-purple-600',
+                bg: 'bg-purple-100',
+                path: '/math/complex',
+                disabled: false
+            },
+            {
+                id: 'algebra',
+                title: 'Algebra',
+                description: 'Sequences, series, and inequalities with dynamic sliders.',
+                icon: Grid,
+                color: 'text-orange-600',
+                bg: 'bg-orange-100',
+                path: '/math/algebra',
+                disabled: false
+            },
+            {
+                id: 'geometry',
+                title: 'Coordinate Geometry',
+                description: 'Rotate and slice 3D conics: parabolas, ellipses, hyperbolas.',
+                icon: Box,
+                color: 'text-emerald-600',
+                bg: 'bg-emerald-100',
+                path: '/math/geometry',
+                disabled: false
+            }
+        ],
+        class12: [
+            {
+                id: 'calculus',
+                title: 'Calculus',
+                description: 'Visualize limits, derivatives, and integrals in real-time.',
+                icon: Sigma,
+                color: 'text-rose-600',
+                bg: 'bg-rose-100',
+                disabled: true
+            },
+            {
+                id: 'matrices',
+                title: 'Matrices & Determinants',
+                description: 'Transform 3D grids and understand linear maps.',
+                icon: Grid,
+                color: 'text-violet-600',
+                bg: 'bg-violet-100',
+                disabled: true
+            },
+            {
+                id: 'vectors',
+                title: 'Vectors & 3D Geometry',
+                description: 'Perform dot/cross products and visualize planes.',
+                icon: ArrowLeft,
+                color: 'text-sky-600',
+                bg: 'bg-sky-100',
+                disabled: true
+            },
+            {
+                id: 'linear',
+                title: 'Linear Programming',
+                description: 'Optimize objective functions in a 3D feasible region.',
+                icon: TrendingUp,
+                color: 'text-lime-600',
+                bg: 'bg-lime-100',
+                disabled: true
+            },
+            {
+                id: 'probability',
+                title: 'Probability Lab',
+                description: 'Roll dice and visualize probability distributions in 3D.',
+                icon: Dices,
+                color: 'text-pink-600',
+                bg: 'bg-pink-100',
+                path: '/math/probability',
+                disabled: false
+            },
+            {
+                id: 'coins',
+                title: 'Coin Toss Sim',
+                description: 'Flip coins and explore sample spaces.',
+                icon: Coins,
+                color: 'text-yellow-600',
+                bg: 'bg-yellow-100',
+                path: '/math/probability/coins',
+                disabled: false
+            },
+        ]
+    };
+
+    if (activeModule === 'hub') {
+        return (
+            <div className="h-full flex flex-col gap-6">
+                <div className="flex items-center gap-4 shrink-0">
+                    <Button variant="ghost" onClick={() => navigate('/')} className="px-2">
+                        <ArrowLeft className="w-6 h-6" />
+                    </Button>
+                    <div>
+                        <h1 className="text-3xl font-display font-black text-brand-black">Math Odyssey</h1>
+                        <p className="text-sm text-gray-500 font-bold">Explore the Universe of Mathematics</p>
+                    </div>
+                </div>
+
+                <div className="flex space-x-1 bg-white p-1 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-fit">
+                    <button
+                        onClick={() => setActiveTab('class11')}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'class11'
+                            ? 'bg-black text-white'
+                            : 'text-gray-500 hover:text-black'
+                            }`}
+                    >
+                        Class 11
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('class12')}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'class12'
+                            ? 'bg-black text-white'
+                            : 'text-gray-500 hover:text-black'
+                            }`}
+                    >
+                        Class 12
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {topics[activeTab].map((topic) => (
+                        <Card
+                            key={topic.id}
+                            hoverEffect={!topic.disabled}
+                            className={`relative ${topic.disabled ? 'opacity-50 grayscale' : 'cursor-pointer'}`}
+                            onClick={() => {
+                                if (!topic.disabled) {
+                                    if (topic.action) topic.action();
+                                    else if (topic.path) navigate(topic.path);
+                                }
+                            }}
+                        >
+                            <div className="flex justify-between items-start mb-4">
+                                <div className={`p-3 rounded-xl ${topic.bg} ${topic.color}`}>
+                                    <topic.icon className="w-6 h-6" />
+                                </div>
+                            </div>
+                            <h3 className="text-lg font-bold mb-2 text-brand-black">{topic.title}</h3>
+                            <p className="text-gray-500 text-sm leading-relaxed">{topic.description}</p>
+
+                            {!topic.disabled && (
+                                <div className="mt-6 flex justify-end">
+                                    <span className={`${topic.color} text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all`}>
+                                        Explore <ArrowLeft className="w-4 h-4 rotate-180" />
+                                    </span>
+                                </div>
+                            )}
+
+                            {topic.disabled && (
+                                <div className="absolute top-4 right-4 px-2 py-1 bg-gray-100 rounded text-xs font-bold text-gray-500 border border-gray-200">
+                                    Coming Soon
+                                </div>
+                            )}
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    return <TrigonometryModule />;
+};

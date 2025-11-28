@@ -13,6 +13,8 @@ export const Chemiverse: React.FC = () => {
             title: "Atomic Structure",
             description: "Explore Bohr and Quantum models of the atom.",
             icon: Atom,
+            color: 'text-blue-600',
+            bg: 'bg-blue-50',
             path: '/chemistry/atomic',
         },
         {
@@ -20,6 +22,8 @@ export const Chemiverse: React.FC = () => {
             title: "Periodic Table",
             description: "Interactive 3D periodic table with trends.",
             icon: Layers,
+            color: 'text-purple-600',
+            bg: 'bg-purple-50',
             path: '/chemistry/periodic',
         },
         {
@@ -27,6 +31,8 @@ export const Chemiverse: React.FC = () => {
             title: "Chemical Bonding",
             description: "VSEPR theory and molecular geometry.",
             icon: Hexagon,
+            color: 'text-pink-600',
+            bg: 'bg-pink-50',
             path: '/chemistry/bonding',
         },
         {
@@ -34,6 +40,8 @@ export const Chemiverse: React.FC = () => {
             title: "States of Matter",
             description: "Particle simulations of solids, liquids, and gases.",
             icon: Snowflake,
+            color: 'text-cyan-600',
+            bg: 'bg-cyan-50',
             path: '/chemistry/states',
         },
         {
@@ -41,6 +49,8 @@ export const Chemiverse: React.FC = () => {
             title: "Chemical Reactions",
             description: "Visualize reaction mechanisms and energy curves.",
             icon: Zap,
+            color: 'text-yellow-600',
+            bg: 'bg-yellow-50',
             path: '/chemistry/reactions',
         },
         {
@@ -48,6 +58,8 @@ export const Chemiverse: React.FC = () => {
             title: "Combustion & Flame",
             description: "Study flame structure and combustion reactions.",
             icon: Flame,
+            color: 'text-orange-600',
+            bg: 'bg-orange-50',
             path: '/chemistry/combustion',
         },
         {
@@ -55,6 +67,8 @@ export const Chemiverse: React.FC = () => {
             title: "Crystal Structures",
             description: "Explore FCC, BCC, and HCP unit cells.",
             icon: Component,
+            color: 'text-emerald-600',
+            bg: 'bg-emerald-50',
             path: '/chemistry/crystals',
         },
         {
@@ -62,6 +76,8 @@ export const Chemiverse: React.FC = () => {
             title: "Electrochemistry",
             description: "Galvanic cells and electrolysis simulations.",
             icon: Zap,
+            color: 'text-lime-600',
+            bg: 'bg-lime-50',
             path: '/chemistry/electro',
         },
         {
@@ -69,6 +85,8 @@ export const Chemiverse: React.FC = () => {
             title: "Organic Molecules",
             description: "Stereochemistry and functional groups.",
             icon: Hexagon,
+            color: 'text-rose-600',
+            bg: 'bg-rose-50',
             path: '/chemistry/organic',
         },
         {
@@ -76,6 +94,8 @@ export const Chemiverse: React.FC = () => {
             title: "Polymers",
             description: "Macromolecules and polymerization chains.",
             icon: Dna,
+            color: 'text-indigo-600',
+            bg: 'bg-indigo-50',
             path: '/chemistry/polymers',
         },
         {
@@ -83,6 +103,8 @@ export const Chemiverse: React.FC = () => {
             title: "Environmental Chemistry",
             description: "Atmospheric layers and pollution simulations.",
             icon: Globe,
+            color: 'text-teal-600',
+            bg: 'bg-teal-50',
             path: '/chemistry/environmental',
         },
         {
@@ -90,6 +112,8 @@ export const Chemiverse: React.FC = () => {
             title: "Molecular Lab",
             description: "Original 3D molecule viewer.",
             icon: FlaskConical,
+            color: 'text-green-600',
+            bg: 'bg-green-50',
             path: '/chemistry/molecules',
         },
     ];
@@ -112,7 +136,7 @@ export const Chemiverse: React.FC = () => {
                         onClick={() => navigate(mod.path)}
                     >
                         <div className="flex justify-between items-start mb-4">
-                            <div className="p-3 bg-green-50 rounded-xl text-green-600">
+                            <div className={`p-3 rounded-xl ${mod.bg} ${mod.color}`}>
                                 <mod.icon className="w-6 h-6" />
                             </div>
                         </div>
@@ -120,7 +144,7 @@ export const Chemiverse: React.FC = () => {
                         <p className="text-gray-500 text-sm leading-relaxed">{mod.description}</p>
 
                         <div className="mt-6 flex justify-end">
-                            <span className="text-green-600 text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+                            <span className={`${mod.color} text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all`}>
                                 Enter Module <ArrowLeft className="w-4 h-4 rotate-180" />
                             </span>
                         </div>

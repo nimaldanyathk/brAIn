@@ -30,6 +30,13 @@ import { Polymers } from './features/chemiverse/Polymers';
 import { EnvironmentalChemistry } from './features/chemiverse/EnvironmentalChemistry';
 import { MoleculeViewer } from './features/chemiverse/MoleculeViewer';
 import { LearningExpress } from './features/learning-express/LearningExpress';
+import { ProbabilityLab } from './features/math/probability/ProbabilityLab';
+import { VennDiagram3D } from './features/math/sets/VennDiagram3D';
+import { RelationsFunctions } from './features/math/relations/RelationsFunctions';
+import { ComplexPlane3D } from './features/math/complex/ComplexPlane3D';
+import { AlgebraGraphs } from './features/math/algebra/AlgebraGraphs';
+import { CoordinateGeometry3D } from './features/math/geometry/CoordinateGeometry3D';
+import { CoinTossSim } from './features/math/probability/CoinTossSim';
 
 // Protected Route Component
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
@@ -137,6 +144,41 @@ function App() {
               <MathOdyssey />
             </AuthGuard>
           } />
+          <Route path='math/probability' element={
+            <AuthGuard>
+              <ProbabilityLab />
+            </AuthGuard>
+          } />
+          <Route path='math/sets' element={
+            <AuthGuard>
+              <VennDiagram3D />
+            </AuthGuard>
+          } />
+          <Route path='math/relations' element={
+            <AuthGuard>
+              <RelationsFunctions />
+            </AuthGuard>
+          } />
+          <Route path='math/complex' element={
+            <AuthGuard>
+              <ComplexPlane3D />
+            </AuthGuard>
+          } />
+          <Route path='math/algebra' element={
+            <AuthGuard>
+              <AlgebraGraphs />
+            </AuthGuard>
+          } />
+          <Route path='math/geometry' element={
+            <AuthGuard>
+              <CoordinateGeometry3D />
+            </AuthGuard>
+          } />
+          <Route path='math/probability/coins' element={
+            <AuthGuard>
+              <CoinTossSim />
+            </AuthGuard>
+          } />
 
           <Route path='chemistry' element={
             <AuthGuard>
@@ -209,9 +251,9 @@ function App() {
               <LearningExpress />
             </AuthGuard>
           } />
-        </Route>
 
-        <Route path='*' element={<Navigate to='/' replace />} />
+          <Route path='*' element={<Navigate to='/' replace />} />
+        </Route>
       </Routes>
     </Router>
   );

@@ -4,6 +4,7 @@ import { Brain, Atom, Calculator, FlaskConical, LogOut, User } from 'lucide-reac
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
 import { AITutorOwl } from '../components/AITutorOwl';
+import { PomodoroTimer } from '../components/PomodoroTimer';
 
 export const Layout: React.FC = () => {
     const navigate = useNavigate();
@@ -46,7 +47,7 @@ export const Layout: React.FC = () => {
         navigate('/login');
     };
 
-        const isHome = location.pathname === '/';
+    const isHome = location.pathname === '/';
 
     return (
         <div className={`flex flex-col bg-surface-gray font-sans text-brand-black selection:bg-brand-blue selection:text-white ${isHome ? 'min-h-screen' : 'h-screen overflow-hidden'}`}>
@@ -65,10 +66,10 @@ export const Layout: React.FC = () => {
                 </div>
 
                 {/* Navigation Links */}
-                                {/* Navigation Links */}
-                
                 {/* Navigation Links */}
-                
+
+                {/* Navigation Links */}
+
                 {/* Navigation Links */}
                 <nav className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
                     <NavLink
@@ -129,34 +130,14 @@ export const Layout: React.FC = () => {
                 </div>
             </main>
 
-            
-            {/* Footer */}
-            <footer className="bg-white border-t-2 border-black py-8 px-6 shrink-0 z-40">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-brand-black rounded-lg flex items-center justify-center border-2 border-black">
-                            <Brain className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="font-display font-black text-xl">brAIn</span>
-                    </div>
-                    <div className="flex flex-wrap justify-center gap-6">
-                        {['About Us', 'How It Works', 'Teacher Mode', 'Community', 'Support'].map((item) => (
-                            <button
-                                key={item}
-                                className="text-sm font-bold text-gray-500 hover:text-brand-black transition-colors"
-                            >
-                                {item}
-                            </button>
-                        ))}
-                    </div>
-                    <div className="text-xs font-medium text-gray-400">
-                        © 2025 brAIn Education. All rights reserved.
-                    </div>
-                </div>
-            </footer>
-            
+
+
+
             {/* Global AI Assistant */}
             <AITutorOwl context={getContext(location.pathname)} />
+
+            {/* Global Pomodoro Timer */}
+            <PomodoroTimer />
         </div>
     );
 };
