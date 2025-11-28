@@ -101,7 +101,7 @@ export const LearningExpress: React.FC = () => {
                 <div className="absolute inset-0 flex items-center justify-center bg-amber-900/20 backdrop-blur-sm z-20">
                     <Card className="p-10 max-w-md w-full text-center border-4 border-amber-400 shadow-2xl bg-[#fff9f0] rounded-[2rem]">
                         <div className="text-6xl mb-4">🚂</div>
-                        <h1 className="text-4xl font-black text-amber-800 mb-2 font-serif">Choo Choo Logic</h1>
+                        <h1 className="text-4xl font-black text-amber-800 mb-2 font-serif">TrAIn</h1>
                         <p className="text-amber-700 mb-8 text-lg">Help the little train find its way!</p>
                         <Button onClick={startGame} className="w-full text-xl py-6 bg-green-500 hover:bg-green-600 text-white rounded-xl shadow-lg border-b-4 border-green-700 active:border-b-0 active:translate-y-1 transition-all">
                             <Play className="w-6 h-6 mr-2 fill-current" />
@@ -118,7 +118,7 @@ export const LearningExpress: React.FC = () => {
                         <div className="text-6xl mb-4">💥</div>
                         <h2 className="text-3xl font-black text-red-600 mb-2">Oh no!</h2>
                         <p className="text-amber-700 mb-6">The track was broken!</p>
-                        <Button onClick={startGame} className="w-full text-xl py-6 bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 transition-all">
+                        <Button onClick={() => window.location.reload()} className="w-full text-xl py-6 bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-lg border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 transition-all">
                             <RefreshCw className="w-6 h-6 mr-2" />
                             Try Again
                         </Button>
