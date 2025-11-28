@@ -38,6 +38,7 @@ import { AlgebraGraphs } from './features/math/algebra/AlgebraGraphs';
 import { CoordinateGeometry3D } from './features/math/geometry/CoordinateGeometry3D';
 import { CoinTossSim } from './features/math/probability/CoinTossSim';
 
+
 // Protected Route Component
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<any>(null);
@@ -251,6 +252,8 @@ function App() {
               <LearningExpress />
             </AuthGuard>
           } />
+
+
 
           <Route path='*' element={<Navigate to='/' replace />} />
         </Route>

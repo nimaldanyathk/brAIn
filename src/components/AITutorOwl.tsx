@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import { X, Send, Book } from 'lucide-react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -26,6 +26,166 @@ interface AITutorOwlProps {
     size?: 'sm' | 'md' | 'lg';
     context?: AITutorOwlContext;
 }
+
+// --- Mascot Owl Character (Duolingo Style) ---
+const OwlAvatar = ({ onClick, isOpen }: { onClick: () => void, isOpen: boolean }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const [isBlinking, setIsBlinking] = useState(false);
+    const controls = useAnimation();
+
+    // Blinking Logic
+    useEffect(() => {
+        const blinkInterval = setInterval(() => {
+            setIsBlinking(true);
+            setTimeout(() => setIsBlinking(false), 200);
+        }, 3000 + Math.random() * 2000); // Random blink interval
+        return () => clearInterval(blinkInterval);
+    }, []);
+
+    // Entrance Animation
+    useEffect(() => {
+        controls.start({
+            x: 0,
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            transition: {
+                type: "spring",
+                stiffness: 70,
+                damping: 12,
+                delay: 0.5
+            }
+        });
+    }, [controls]);
+
+    return (
+        <motion.div
+            className="fixed bottom-8 right-8 z-50 cursor-pointer"
+            initial={{ x: 200, y: 50, opacity: 0, scale: 0.5 }}
+            animate={controls}
+            onClick={onClick}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            style={{ display: isOpen ? 'none' : 'block' }}
+        >
+            {/* Breathing Animation */}
+            <motion.div
+                animate={{ scaleY: [1, 1.03, 1], y: [0, -2, 0] }}
+                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+            >
+                <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Shadow */}
+                    <ellipse cx="70" cy="130" rx="40" ry="6" fill="black" fillOpacity="0.2" />
+
+                    {/* Feet */}
+                    <path d="M55 125 L 45 135 L 65 135 Z" fill="#f59e0b" stroke="#b45309" strokeWidth="2" strokeLinejoin="round" />
+                    <path d="M85 125 L 75 135 L 95 135 Z" fill="#f59e0b" stroke="#b45309" strokeWidth="2" strokeLinejoin="round" />
+
+                    {/* Body - Plump Pear Shape */}
+                    <path
+                        d="M35 120 C 15 120, 10 70, 30 50 C 40 40, 100 40, 110 50 C 130 70, 125 120, 105 120 C 90 120, 50 120, 35 120 Z"
+                        fill="#3b82f6"
+                        stroke="#1d4ed8"
+                        strokeWidth="3"
+                    />
+
+                    {/* Belly Patch */}
+                    <path
+                        d="M45 115 C 35 115, 30 80, 45 65 C 55 55, 85 55, 95 65 C 110 80, 105 115, 95 115 Z"
+                        fill="#bfdbfe"
+                    />
+
+                    {/* Head - Integrated with Body but defined by features */}
+
+                    {/* Eyes - Large and Expressive */}
+                    <g transform="translate(0, -5)">
+                        {/* Left Eye */}
+                        <circle cx="50" cy="55" r="16" fill="white" stroke="#1d4ed8" strokeWidth="2" />
+                        <motion.circle
+                            cx="52"
+                            cy="55"
+                            r="6"
+                            fill="#1e3a8a"
+                            animate={isHovered ? { scaleY: 0.8, scaleX: 1.1 } : { scale: 1 }}
+                        />
+                        <circle cx="54" cy="53" r="2" fill="white" />
+
+                        {/* Left Eyelid */}
+                        <motion.path
+                            d="M34 55 Q 50 75 66 55"
+                            fill="#3b82f6"
+                            initial={{ scaleY: 0 }}
+                            animate={{ scaleY: isBlinking ? 1 : 0 }}
+                            style={{ originY: 0 }}
+                        />
+
+                        {/* Right Eye */}
+                        <circle cx="90" cy="55" r="16" fill="white" stroke="#1d4ed8" strokeWidth="2" />
+                        <motion.circle
+                            cx="88"
+                            cy="55"
+                            r="6"
+                            fill="#1e3a8a"
+                            animate={isHovered ? { scaleY: 0.8, scaleX: 1.1 } : { scale: 1 }}
+                        />
+                        <circle cx="90" cy="53" r="2" fill="white" />
+
+                        {/* Right Eyelid */}
+                        <motion.path
+                            d="M74 55 Q 90 75 106 55"
+                            fill="#3b82f6"
+                            initial={{ scaleY: 0 }}
+                            animate={{ scaleY: isBlinking ? 1 : 0 }}
+                            style={{ originY: 0 }}
+                        />
+                    </g>
+
+                    {/* Beak */}
+                    <path d="M70 60 Q 60 75 70 80 Q 80 75 70 60" fill="#f59e0b" stroke="#b45309" strokeWidth="1" />
+
+                    {/* Wings / Hands */}
+
+                    {/* Right Wing (Holding Book) */}
+                    <g transform="translate(95, 80) rotate(-10)">
+                        {/* The Book */}
+                        <rect x="-5" y="-10" width="25" height="35" rx="2" fill="#7c2d12" stroke="#451a03" strokeWidth="1" />
+                        <rect x="0" y="-5" width="15" height="25" fill="white" />
+                        <path d="M2 0 L 13 0" stroke="black" strokeWidth="1" opacity="0.5" />
+                        <path d="M2 5 L 13 5" stroke="black" strokeWidth="1" opacity="0.5" />
+
+                        {/* The Wing wrapping around */}
+                        <path d="M-15 -5 Q 5 -5 10 15 Q 5 30 -15 20" fill="#3b82f6" stroke="#1d4ed8" strokeWidth="2" />
+                    </g>
+
+                    {/* Left Wing (Waving) */}
+                    <motion.g
+                        transform="translate(25, 80)"
+                        animate={isHovered ? { rotate: [0, -20, 10, -20, 0] } : { rotate: 0 }}
+                        transition={{ duration: 0.6, ease: "easeInOut" }}
+                        style={{ originX: 20, originY: 0 }} // Pivot at shoulder
+                    >
+                        <path
+                            d="M20 0 Q -10 10 -5 35 Q 10 40 25 20"
+                            fill="#3b82f6"
+                            stroke="#1d4ed8"
+                            strokeWidth="2"
+                        />
+                    </motion.g>
+
+                    {/* Graduation Cap */}
+                    <g transform="translate(70, 25) rotate(-5)">
+                        <path d="M-30 0 L 0 -10 L 30 0 L 0 10 Z" fill="#1f2937" stroke="black" strokeWidth="1" />
+                        <rect x="-15" y="0" width="30" height="15" rx="5" fill="#1f2937" />
+                        {/* Tassel */}
+                        <path d="M0 0 L 20 15" stroke="#f59e0b" strokeWidth="2" />
+                        <circle cx="20" cy="15" r="3" fill="#f59e0b" />
+                    </g>
+
+                </svg>
+            </motion.div>
+        </motion.div>
+    );
+};
 
 export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -53,15 +213,15 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
 
     function getGreeting(ctx: AITutorOwlContext) {
         switch (ctx) {
-            case 'physics': return "Ready to explore the laws of the universe? Ask me about forces, energy, or circuits!";
+            case 'physics': return "Hoo-Hoo! Ready to explore the laws of the universe? Ask me about forces, energy, or circuits!";
             case 'math': return "Mathematics is the language of nature. Need help with angles or equations?";
             case 'chemistry': return "Welcome to the molecular level! Ask me about atoms, bonds, or elements.";
-            default: return "Hello Cadet! I'm Astra. How can I help you today?";
+            default: return "Greetings Cadet! I'm Prof Owl. How can I assist your studies today?";
         }
     }
 
     const getSystemPrompt = (ctx: AITutorOwlContext) => {
-        const basePrompt = "You are Astra, a helpful, enthusiastic AI tutor for students in a virtual STEM lab called 'brAIn'.";
+        const basePrompt = "You are Prof Owl, a wise, slightly eccentric, but helpful AI tutor for students in a virtual STEM lab called 'brAIn'. You often use owl-related puns like 'Hoo-Hoo' or 'Let's fly through this'.";
         const formatting = "Use Markdown for formatting. Use bold for key terms. Use bullet points for lists. Keep answers concise (under 3 sentences) unless asked for detail.";
 
         switch (ctx) {
@@ -101,7 +261,7 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
                     },
                     {
                         role: "model",
-                        parts: [{ text: "Understood. I am Astra, ready to help with " + context + "." }],
+                        parts: [{ text: "Understood. I am Prof Owl, ready to help with " + context + "." }],
                     },
                     ...history
                 ],
@@ -130,26 +290,8 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
 
     return (
         <>
-            {/* Floating Trigger */}
-            <motion.div
-                className="fixed bottom-8 right-8 z-50"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                whileHover={{ scale: 1.1 }}
-            >
-                <button
-                    className={cn(
-                        "w-16 h-16 bg-brand-black text-white rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-                        isOpen && "hidden"
-                    )}
-                    onClick={() => setIsOpen(true)}
-                >
-                    <div className="relative">
-                        <Sparkles className="w-8 h-8 animate-pulse" />
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-black" />
-                    </div>
-                </button>
-            </motion.div>
+            {/* Mascot Owl Trigger */}
+            <OwlAvatar onClick={() => setIsOpen(true)} isOpen={isOpen} />
 
             {/* Chat Window */}
             <AnimatePresence>
@@ -163,11 +305,11 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
                         {/* Header */}
                         <div className="p-4 border-b-2 border-black flex items-center justify-between bg-gray-50">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-brand-black flex items-center justify-center text-white border-2 border-black">
-                                    <Sparkles className="w-5 h-5" />
+                                <div className="w-10 h-10 rounded-full bg-brand-blue flex items-center justify-center text-white border-2 border-black">
+                                    <Book className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 className="font-black text-brand-black">Astra AI</h3>
+                                    <h3 className="font-black text-brand-black">Prof Owl</h3>
                                     <p className="text-xs text-brand-blue font-bold flex items-center gap-1 uppercase tracking-wider">
                                         <span className="w-2 h-2 bg-green-400 rounded-full border border-black animate-pulse" /> Online
                                     </p>
@@ -223,7 +365,7 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
                                     type="text"
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
-                                    placeholder={`Ask about ${context}...`}
+                                    placeholder={`Ask Prof Owl about ${context}...`}
                                     className="flex-1 bg-white border-2 border-black rounded-xl px-4 py-2 text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none transition-all"
                                 />
                                 <Button type="submit" variant="primary" size="sm" className="rounded-xl px-3" disabled={isTyping}>

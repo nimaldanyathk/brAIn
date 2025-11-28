@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, Float } from '@react-three/drei';
+import * as THREE from 'three';
 import { ArrowLeft, Coins, RefreshCw } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
@@ -11,14 +12,30 @@ import { Slider } from '../../../components/ui/Slider';
 
 const Coin = ({
     position,
-    rotation
+    rotation,
+    isFlipping
 }: {
     position: [number, number, number],
-    rotation: [number, number, number]
+    rotation: [number, number, number],
+    isFlipping: boolean
 }) => {
+    const meshRef = React.useRef<THREE.Group>(null);
+
+    useFrame((_state, delta) => {
+        if (meshRef.current) {
+            // Smoothly interpolate rotation
+            if (isFlipping) {
+                meshRef.current.rotation.x += 20 * delta;
+            } else {
+                // Lerp to target rotation
+                meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, rotation[0], 10 * delta);
+            }
+        }
+    });
+
     return (
         <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-            <group position={position} rotation={rotation}>
+            <group ref={meshRef} position={position} rotation={[0, 0, 0]}> {/* Initial rotation handled by ref */}
                 {/* Coin Body */}
                 <mesh castShadow receiveShadow>
                     <cylinderGeometry args={[1.5, 1.5, 0.2, 32]} />
@@ -183,7 +200,8 @@ export const CoinTossSim: React.FC = () => {
                                     <Coin
                                         key={i}
                                         position={[offset, 0, 0]}
-                                        rotation={[isFlipping ? Math.PI * 10 : (results[i] === 'T' ? Math.PI : 0), 0, 0]}
+                                        rotation={[results[i] === 'T' ? Math.PI : 0, 0, 0]}
+                                        isFlipping={isFlipping}
                                     />
                                 );
                             })}

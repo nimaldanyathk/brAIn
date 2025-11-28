@@ -1,13 +1,16 @@
 ﻿import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Sparkles, Atom, Calculator, FlaskConical, Star, BookOpen, Users, Trophy, Train } from 'lucide-react';
+import { ArrowRight, Sparkles, Atom, Calculator, FlaskConical, Star, BookOpen, Users, Trophy, Train, Eye } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { UltramodernButton } from '../components/ui/UltramodernButton';
+import { SimulationPreview } from '../components/SimulationPreview';
+import { IllusionGallery } from '../features/illusions/IllusionGallery';
 
 export const Home: React.FC = () => {
     const navigate = useNavigate();
     const containerRef = useRef<HTMLDivElement>(null);
+    const [username] = React.useState("Cadet"); // TODO: Replace with Google Login user data
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start start", "end end"]
@@ -82,7 +85,7 @@ export const Home: React.FC = () => {
     // Scroll Mask Effect & Parallax
     const maskOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
     const maskY = useTransform(scrollYProgress, [0, 0.15], [0, -50]);
-    const treePathLength = useTransform(scrollYProgress, [0, 0.8], [0, 1]);
+
 
     return (
         <div ref={containerRef} className="relative min-h-[200vh] pb-20 overflow-hidden">
@@ -118,42 +121,7 @@ export const Home: React.FC = () => {
                 ))}
             </div>
 
-            {/* Continuous Birch Tree Visual */}
-            <div className="absolute top-0 right-0 w-64 pointer-events-none z-0 hidden md:block" style={{ height: '300vh' }}>
-                <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 200 3000">
-                    {/* Birch Trunk - White with Dark Patches */}
-                    <defs>
-                        <pattern id="birchBark" x="0" y="0" width="20" height="40" patternUnits="userSpaceOnUse">
-                            <rect width="20" height="40" fill="#f3f4f6" />
-                            <path d="M0 10 Q 5 12, 10 10 T 20 10" stroke="#374151" strokeWidth="1" fill="none" opacity="0.3" />
-                            <path d="M5 25 Q 10 28, 15 25" stroke="#374151" strokeWidth="1" fill="none" opacity="0.3" />
-                            <path d="M0 35 Q 8 38, 12 35" stroke="#374151" strokeWidth="1" fill="none" opacity="0.3" />
-                        </pattern>
-                    </defs>
 
-                    {/* Main Trunk */}
-                    <motion.path
-                        d="M 200 800 Q 160 1000, 180 1400 T 170 2000 T 190 2800"
-                        stroke="url(#birchBark)"
-                        strokeWidth="24"
-                        fill="none"
-                        style={{ pathLength: treePathLength }}
-                    />
-                    {/* Trunk Border for definition */}
-                    <motion.path
-                        d="M 200 800 Q 160 1000, 180 1400 T 170 2000 T 190 2800"
-                        stroke="#d1d5db"
-                        strokeWidth="26"
-                        fill="none"
-                        style={{ pathLength: treePathLength }}
-                        strokeLinecap="round"
-                        className="-z-10"
-                    />
-
-                    {/* Branch connection point */}
-                    <circle cx="200" cy="800" r="12" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="2" />
-                </svg>
-            </div>
 
             {/* Hero Section with Parallax & Scroll Mask */}
             <section className="relative h-[100vh] flex items-center justify-center sticky top-0">
@@ -179,7 +147,7 @@ export const Home: React.FC = () => {
                         </div>
                         <h1 className="text-5xl md:text-7xl font-display font-black mb-6 text-brand-black leading-tight">
                             Welcome back, <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-accent-green">Cadet!</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-accent-green">{username}!</span>
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-500 mb-10 leading-relaxed font-medium">
                             Your daily mission awaits. Choose a realm to continue your training.
@@ -275,16 +243,25 @@ export const Home: React.FC = () => {
                             </div>
                         </div>
                         <div className="relative h-96 bg-gray-100 rounded-3xl border-2 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(59,130,246,0.2),transparent_70%)]" />
-                            {/* Placeholder for feature visual */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-gray-400 font-black text-2xl uppercase tracking-widest opacity-20">Simulation Preview</span>
-                            </div>
+                            <SimulationPreview />
                         </div>
                     </div>
                 </section>
-            </div>
-        </div>
+
+                {/* Illusions Section */}
+                <section className="max-w-7xl mx-auto px-6 mb-20">
+                    <div className="flex items-center gap-4 mb-12">
+                        <div className="h-px flex-1 bg-black/10" />
+                        <h2 className="text-3xl font-display font-black flex items-center gap-3 text-brand-black bg-surface-gray px-6 py-2 rounded-xl border-2 border-black/5">
+                            <Eye className="w-8 h-8 text-purple-600" />
+                            Mind Benders
+                        </h2>
+                        <div className="h-px flex-1 bg-black/10" />
+                    </div>
+                    <IllusionGallery />
+                </section>
+            </div >
+        </div >
     );
 };
 
