@@ -1,18 +1,10 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { PointerLockControls, PerspectiveCamera, Environment, Text, useTexture, Trail, Decal } from '@react-three/drei';
+import { PointerLockControls, PerspectiveCamera, Environment, Trail } from '@react-three/drei';
 import * as THREE from 'three';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { RefreshCw, Target, Crosshair, MousePointer2 } from 'lucide-react';
-
-// --- Types ---
-interface RecoilSimulationProps {
-    gunMass: number;
-    bulletMass: number;
-    muzzleVelocity: number;
-    onFire: (recoilVelocity: number) => void;
-}
+import { Crosshair, RefreshCw, Target, MousePointer2 } from 'lucide-react';
 
 // --- Sound Utility ---
 const playGunshot = () => {
@@ -187,7 +179,6 @@ const Scene = ({
     bulletMass,
     muzzleVelocity,
     onHit,
-    setScore,
     holes,
     setHoles,
     isLocked,
@@ -197,7 +188,6 @@ const Scene = ({
     bulletMass: number;
     muzzleVelocity: number;
     onHit: () => void;
-    setScore: React.Dispatch<React.SetStateAction<number>>;
     holes: THREE.Vector3[];
     setHoles: React.Dispatch<React.SetStateAction<THREE.Vector3[]>>;
     isLocked: boolean;
@@ -324,7 +314,6 @@ export const RecoilSimulation: React.FC = () => {
     const [gunMass, setGunMass] = useState(5); // kg
     const [bulletMass, setBulletMass] = useState(0.05); // kg
     const [muzzleVelocity, setMuzzleVelocity] = useState(400); // m/s
-    const [lastRecoilVel, setLastRecoilVel] = useState(0);
     const [score, setScore] = useState(0);
     const [holes, setHoles] = useState<THREE.Vector3[]>([]);
     const [isLocked, setIsLocked] = useState(false);
@@ -339,7 +328,6 @@ export const RecoilSimulation: React.FC = () => {
                         bulletMass={bulletMass}
                         muzzleVelocity={muzzleVelocity}
                         onHit={() => setScore(s => s + 1)}
-                        setScore={setScore}
                         holes={holes}
                         setHoles={setHoles}
                         isLocked={isLocked}
@@ -457,7 +445,6 @@ export const RecoilSimulation: React.FC = () => {
                         className="w-full mt-6 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
                         onClick={() => {
                             setScore(0);
-                            setLastRecoilVel(0);
                             setHoles([]);
                         }}
                     >

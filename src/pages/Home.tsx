@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Atom, FlaskConical, Calculator, ArrowRight, Star, Sparkles } from 'lucide-react';
+import { Atom, FlaskConical, Calculator, ArrowRight, Star, Sparkles, Train } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { UltramodernButton } from '../components/ui/UltramodernButton';
 
@@ -38,6 +38,16 @@ export const Home: React.FC = () => {
             color: 'text-accent-yellow',
             bg: 'bg-yellow-100',
             path: '/math',
+            progress: 0,
+        },
+        {
+            id: 'learning-express',
+            title: 'Learning Express',
+            description: 'All aboard! Solve puzzles to keep the train moving.',
+            icon: Train,
+            color: 'text-red-500',
+            bg: 'bg-red-100',
+            path: '/learning-express',
             progress: 0,
         },
     ];
