@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Info, Sliders, Box } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Slider } from '../../components/ui/Slider';
-import { Astra } from '../../components/Astra';
+
 import { CircuitBuilder } from './CircuitBuilder';
 import { Experiment3D } from './Experiment3D';
 
@@ -73,7 +73,7 @@ export const OhmsLaw: React.FC = () => {
                     </Button>
                     <div>
                         <h1 className="text-3xl font-display font-black text-brand-black">Ohm's Law</h1>
-                        <p className="text-sm text-gray-500 font-bold">Voltage = Current × Resistance</p>
+                        <p className="text-sm text-gray-500 font-bold">Voltage = Current Ã— Resistance</p>
                     </div>
                 </div>
 
@@ -101,7 +101,7 @@ export const OhmsLaw: React.FC = () => {
                     </div>
                     <div>
                         <span className="text-xs text-gray-500 font-black uppercase">Resistance</span>
-                        <p className="text-xl font-mono font-black text-purple-600">{activeResistance}Ω</p>
+                        <p className="text-xl font-mono font-black text-purple-600">{activeResistance}Î©</p>
                     </div>
                     <div className="w-0.5 h-8 bg-gray-200" />
                     <div>
@@ -116,7 +116,7 @@ export const OhmsLaw: React.FC = () => {
                 <div className="lg:col-span-1 flex flex-col gap-6">
                     <Card className="bg-blue-50 border-blue-200">
                         <div className="flex flex-col items-center text-center gap-4">
-                            <Astra context="physics" size="sm" topic="ohms-law" />
+                            
                             <p className="text-sm leading-relaxed text-brand-black font-bold">{astraMessage}</p>
                         </div>
                     </Card>
@@ -130,7 +130,7 @@ export const OhmsLaw: React.FC = () => {
                             <div className="space-y-6">
                                 <p className="text-sm text-gray-600 font-medium">Adjust the sliders to see how Voltage and Resistance affect the flow of electrons in 3D.</p>
                                 <Slider label="Voltage (V)" value={voltage} min={1} max={20} unit="V" color="blue" onChange={setVoltage} />
-                                <Slider label="Resistance (Ω)" value={resistance} min={10} max={500} step={10} unit="Ω" color="purple" onChange={setResistance} />
+                                <Slider label="Resistance (Î©)" value={resistance} min={10} max={500} step={10} unit="Î©" color="purple" onChange={setResistance} />
                             </div>
                         ) : (
                             <ul className="space-y-3 text-sm text-gray-600 font-medium list-disc list-inside">
@@ -172,3 +172,4 @@ export const OhmsLaw: React.FC = () => {
         </div>
     );
 };
+

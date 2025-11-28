@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calculator } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Slider } from '../components/ui/Slider';
-import { Astra } from '../components/Astra';
+
 
 export const MathOdyssey: React.FC = () => {
     const navigate = useNavigate();
@@ -45,7 +45,7 @@ export const MathOdyssey: React.FC = () => {
                 <div className="lg:col-span-1 flex flex-col gap-6">
                     <Card className="bg-yellow-50 border-yellow-200">
                         <div className="flex flex-col items-center text-center gap-4">
-                            <Astra context="math" size="sm" />
+                            
                             <p className="text-sm leading-relaxed text-brand-black font-bold">
                                 "The Unit Circle connects angles to coordinates! Watch how Sine (height) and Cosine (width) change."
                             </p>
@@ -63,7 +63,7 @@ export const MathOdyssey: React.FC = () => {
                                 value={angle}
                                 min={0}
                                 max={360}
-                                unit="°"
+                                unit="Â°"
                                 color="red"
                                 onChange={setAngle}
                             />
@@ -107,7 +107,7 @@ export const MathOdyssey: React.FC = () => {
                                 strokeWidth="2"
                                 strokeDasharray="4 2"
                             />
-                            <text x="190" y="140" className="text-xs font-bold fill-yellow-600">{angle}°</text>
+                            <text x="190" y="140" className="text-xs font-bold fill-yellow-600">{angle}Â°</text>
 
                             {/* Radius Line */}
                             <line x1="150" y1="150" x2={x} y2={y} stroke="#1d1d1f" strokeWidth="2" />
@@ -131,3 +131,4 @@ export const MathOdyssey: React.FC = () => {
         </div>
     );
 };
+

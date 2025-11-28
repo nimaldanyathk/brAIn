@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Brain, Atom, Calculator, FlaskConical, LogOut, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
-import { Astra } from '../components/Astra';
+import { AITutorOwl } from '../components/AITutorOwl';
 
 export const Layout: React.FC = () => {
     const navigate = useNavigate();
@@ -42,7 +42,7 @@ export const Layout: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-surface-gray overflow-hidden font-sans text-brand-black selection:bg-brand-blue selection:text-white">
+        <div className="flex flex-col min-h-screen bg-surface-gray font-sans text-brand-black selection:bg-brand-blue selection:text-white">
             {/* Top Navigation Bar */}
             <header className="h-16 bg-white border-b-2 border-black flex items-center justify-between px-6 shrink-0 z-50">
                 {/* Logo */}
@@ -58,22 +58,27 @@ export const Layout: React.FC = () => {
                 </div>
 
                 {/* Navigation Links */}
-                <nav className="hidden md:flex items-center gap-2">
+                                {/* Navigation Links */}
+                
+                {/* Navigation Links */}
+                
+                {/* Navigation Links */}
+                <nav className="hidden md:flex items-center gap-1">
                     <NavLink
                         to="/physix"
-                        className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-lg font-bold border-2 transition-all ${isActive ? 'bg-blue-100 border-black text-brand-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'border-transparent text-gray-500 hover:text-brand-black hover:bg-gray-100'}`}
+                        className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-lg font-bold border-2 transition-all text-sm ${isActive ? 'bg-blue-100 border-black text-brand-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'border-transparent text-gray-500 hover:text-brand-black hover:bg-gray-100'}`}
                     >
                         <Atom className="w-4 h-4" /> PhysiX
                     </NavLink>
                     <NavLink
                         to="/math"
-                        className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-lg font-bold border-2 transition-all ${isActive ? 'bg-yellow-100 border-black text-brand-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'border-transparent text-gray-500 hover:text-brand-black hover:bg-gray-100'}`}
+                        className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-lg font-bold border-2 transition-all text-sm ${isActive ? 'bg-yellow-100 border-black text-brand-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'border-transparent text-gray-500 hover:text-brand-black hover:bg-gray-100'}`}
                     >
                         <Calculator className="w-4 h-4" /> Math
                     </NavLink>
                     <NavLink
                         to="/chemistry"
-                        className={({ isActive }) => `flex items-center gap-2 px-4 py-2 rounded-lg font-bold border-2 transition-all ${isActive ? 'bg-green-100 border-black text-brand-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'border-transparent text-gray-500 hover:text-brand-black hover:bg-gray-100'}`}
+                        className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-lg font-bold border-2 transition-all text-sm ${isActive ? 'bg-green-100 border-black text-brand-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'border-transparent text-gray-500 hover:text-brand-black hover:bg-gray-100'}`}
                     >
                         <FlaskConical className="w-4 h-4" /> Chemistry
                     </NavLink>
@@ -108,14 +113,40 @@ export const Layout: React.FC = () => {
             </header>
 
             {/* Main Content Area */}
-            <main className="flex-1 overflow-y-auto relative p-6 scroll-smooth">
+            <main className="flex-1 relative p-6 scroll-smooth">
                 <div className="h-full w-full max-w-7xl mx-auto flex flex-col">
                     <Outlet />
                 </div>
             </main>
 
+            
+            {/* Footer */}
+            <footer className="bg-white border-t-2 border-black py-8 px-6 shrink-0 z-40">
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-brand-black rounded-lg flex items-center justify-center border-2 border-black">
+                            <Brain className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-display font-black text-xl">brAIn</span>
+                    </div>
+                    <div className="flex flex-wrap justify-center gap-6">
+                        {['About Us', 'How It Works', 'Teacher Mode', 'Community', 'Support'].map((item) => (
+                            <button
+                                key={item}
+                                className="text-sm font-bold text-gray-500 hover:text-brand-black transition-colors"
+                            >
+                                {item}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="text-xs font-medium text-gray-400">
+                        © 2025 brAIn Education. All rights reserved.
+                    </div>
+                </div>
+            </footer>
+            
             {/* Global AI Assistant */}
-            <Astra context={getContext(location.pathname)} />
+            <AITutorOwl context={getContext(location.pathname)} />
         </div>
     );
 };
@@ -126,3 +157,8 @@ function getContext(path: string): 'physics' | 'math' | 'chemistry' | 'general' 
     if (path.includes('chemistry') || path.includes('chemiverse')) return 'chemistry';
     return 'general';
 }
+
+
+
+
+

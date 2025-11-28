@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { FlaskConical } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Slider } from '../../components/ui/Slider';
-import { Astra } from '../../components/Astra';
+
 
 const MOLECULES = {
     ch4: {
@@ -238,7 +238,7 @@ export const MoleculeViewer = () => {
                 <div className="lg:col-span-1 flex flex-col gap-6">
                     <Card className="bg-green-50 border-green-200">
                         <div className="flex flex-col items-center text-center gap-4">
-                            <Astra context="chemistry" size="sm" />
+                            
                             <p className="text-sm leading-relaxed text-brand-black font-bold">
                                 "Explore molecular geometries! Try adjusting the bond angle for Water to see how repulsion works."
                             </p>
@@ -307,3 +307,4 @@ export const MoleculeViewer = () => {
         </div>
     );
 };
+

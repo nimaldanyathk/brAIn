@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Play, Pause, RotateCcw, Activity, Settings2, Target, Atom } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { Astra } from '../../components/Astra';
+
 import { RecoilSimulation } from './RecoilSimulation';
 
 export const Momentum: React.FC = () => {
@@ -164,7 +164,7 @@ export const Momentum: React.FC = () => {
                                 {/* Object 1 Controls */}
                                 <div className="p-4 bg-blue-50 rounded-lg space-y-3 border border-blue-100">
                                     <h3 className="font-bold text-blue-800 flex justify-between">
-                                        Blue Object <span>m₁ = {m1}kg</span>
+                                        Blue Object <span>mâ‚ = {m1}kg</span>
                                     </h3>
                                     <div>
                                         <label className="block text-xs font-medium text-gray-700 mb-1">Mass</label>
@@ -179,7 +179,7 @@ export const Momentum: React.FC = () => {
                                 {/* Object 2 Controls */}
                                 <div className="p-4 bg-red-50 rounded-lg space-y-3 border border-red-100">
                                     <h3 className="font-bold text-red-800 flex justify-between">
-                                        Red Object <span>m₂ = {m2}kg</span>
+                                        Red Object <span>mâ‚‚ = {m2}kg</span>
                                     </h3>
                                     <div>
                                         <label className="block text-xs font-medium text-gray-700 mb-1">Mass</label>
@@ -219,9 +219,9 @@ export const Momentum: React.FC = () => {
                                 <Activity className="w-5 h-5 text-green-600 mt-1" />
                                 <div>
                                     <h3 className="font-bold text-green-800 mb-1">Total Momentum</h3>
-                                    <p className="text-3xl font-black text-green-700 tracking-tight">{totalMomentum.toFixed(2)} <span className="text-sm font-normal text-green-600">kg·m/s</span></p>
+                                    <p className="text-3xl font-black text-green-700 tracking-tight">{totalMomentum.toFixed(2)} <span className="text-sm font-normal text-green-600">kgÂ·m/s</span></p>
                                     <p className="text-xs text-green-800 mt-2 font-mono bg-green-100 p-2 rounded">
-                                        P_total = m₁v₁ + m₂v₂
+                                        P_total = mâ‚vâ‚ + mâ‚‚vâ‚‚
                                     </p>
                                 </div>
                             </div>
@@ -256,7 +256,7 @@ export const Momentum: React.FC = () => {
                                 }}
                             >
                                 <span className={`text-xs font-bold text-blue-700 absolute -top-5 ${v1 < 0 ? 'rotate-180 right-0' : 'left-0'}`}>
-                                    p₁ = {(m1 * v1).toFixed(1)}
+                                    pâ‚ = {(m1 * v1).toFixed(1)}
                                 </span>
                                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-l-[8px] border-l-blue-500 border-b-[6px] border-b-transparent"></div>
                             </div>
@@ -281,7 +281,7 @@ export const Momentum: React.FC = () => {
                                 }}
                             >
                                 <span className={`text-xs font-bold text-red-700 absolute -top-5 ${v2 < 0 ? 'rotate-180 right-0' : 'left-0'}`}>
-                                    p₂ = {(m2 * v2).toFixed(1)}
+                                    pâ‚‚ = {(m2 * v2).toFixed(1)}
                                 </span>
                                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-l-[8px] border-l-red-500 border-b-[6px] border-b-transparent"></div>
                             </div>
@@ -297,11 +297,11 @@ export const Momentum: React.FC = () => {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 text-sm">
                                     <div>
-                                        <div className="text-gray-500 text-xs">Velocity (v₁)</div>
+                                        <div className="text-gray-500 text-xs">Velocity (vâ‚)</div>
                                         <div className="font-mono font-bold">{v1.toFixed(2)} m/s</div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-gray-500 text-xs">Momentum (p₁)</div>
+                                        <div className="text-gray-500 text-xs">Momentum (pâ‚)</div>
                                         <div className="font-mono font-bold text-blue-600">{(m1 * v1).toFixed(2)}</div>
                                     </div>
                                 </div>
@@ -314,11 +314,11 @@ export const Momentum: React.FC = () => {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 text-sm">
                                     <div>
-                                        <div className="text-gray-500 text-xs">Velocity (v₂)</div>
+                                        <div className="text-gray-500 text-xs">Velocity (vâ‚‚)</div>
                                         <div className="font-mono font-bold">{v2.toFixed(2)} m/s</div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-gray-500 text-xs">Momentum (p₂)</div>
+                                        <div className="text-gray-500 text-xs">Momentum (pâ‚‚)</div>
                                         <div className="font-mono font-bold text-red-600">{(m2 * v2).toFixed(2)}</div>
                                     </div>
                                 </div>
@@ -333,7 +333,8 @@ export const Momentum: React.FC = () => {
             ) : (
                 <RecoilSimulation />
             )}
-            <Astra context="physics" topic="momentum" />
+            
         </div>
     );
 };
+

@@ -1,18 +1,13 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { PointerLockControls, PerspectiveCamera, Environment, Text, useTexture, Trail, Decal } from '@react-three/drei';
+import { PointerLockControls, PerspectiveCamera, Environment, Trail } from '@react-three/drei';
 import * as THREE from 'three';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { RefreshCw, Target, Crosshair, MousePointer2 } from 'lucide-react';
 
 // --- Types ---
-interface RecoilSimulationProps {
-    gunMass: number;
-    bulletMass: number;
-    muzzleVelocity: number;
-    onFire: (recoilVelocity: number) => void;
-}
+
 
 // --- Sound Utility ---
 const playGunshot = () => {
@@ -187,7 +182,7 @@ const Scene = ({
     bulletMass,
     muzzleVelocity,
     onHit,
-    setScore,
+    
     holes,
     setHoles,
     isLocked,
@@ -324,7 +319,7 @@ export const RecoilSimulation: React.FC = () => {
     const [gunMass, setGunMass] = useState(5); // kg
     const [bulletMass, setBulletMass] = useState(0.05); // kg
     const [muzzleVelocity, setMuzzleVelocity] = useState(400); // m/s
-    const [lastRecoilVel, setLastRecoilVel] = useState(0);
+    
     const [score, setScore] = useState(0);
     const [holes, setHoles] = useState<THREE.Vector3[]>([]);
     const [isLocked, setIsLocked] = useState(false);
@@ -365,7 +360,7 @@ export const RecoilSimulation: React.FC = () => {
                 {/* Instructions Overlay */}
                 {isLocked && (
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none text-white/50 text-xs font-mono">
-                        CLICK TO FIRE • ESC TO EXIT
+                        CLICK TO FIRE â€¢ ESC TO EXIT
                     </div>
                 )}
 
@@ -448,7 +443,7 @@ export const RecoilSimulation: React.FC = () => {
                             {((bulletMass * muzzleVelocity) / gunMass).toFixed(2)} m/s
                         </div>
                         <div className="text-xs text-gray-500 mt-2">
-                            v_gun = (m_bullet × v_bullet) / m_gun
+                            v_gun = (m_bullet Ã— v_bullet) / m_gun
                         </div>
                     </div>
 
@@ -457,7 +452,7 @@ export const RecoilSimulation: React.FC = () => {
                         className="w-full mt-6 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
                         onClick={() => {
                             setScore(0);
-                            setLastRecoilVel(0);
+                            
                             setHoles([]);
                         }}
                     >
@@ -469,3 +464,7 @@ export const RecoilSimulation: React.FC = () => {
         </div>
     );
 };
+
+
+
+

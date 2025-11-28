@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Play, Pause, RotateCcw, Info, Battery, Gauge } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { Astra } from '../../components/Astra';
+
 
 export const Energy: React.FC = () => {
     const navigate = useNavigate();
@@ -46,7 +46,7 @@ export const Energy: React.FC = () => {
                 {activeTab === 'work' && <WorkEnergy />}
                 {activeTab === 'conservation' && <ConservationEnergy />}
             </div>
-            <Astra context="physics" topic="energy" />
+            
         </div>
     );
 };
@@ -199,7 +199,7 @@ const WorkEnergy: React.FC = () => {
                             style={{ transform: `translateX(${distance * 5}px)` }}
                         >
                             <div className="w-24 h-10 flex items-center justify-center">
-                                <span className="text-red-500 font-bold animate-pulse whitespace-nowrap">Force {force}N →</span>
+                                <span className="text-red-500 font-bold animate-pulse whitespace-nowrap">Force {force}N â†’</span>
                             </div>
                         </div>
                     )}
@@ -382,3 +382,4 @@ const ConservationEnergy: React.FC = () => {
         </div>
     );
 };
+

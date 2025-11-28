@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Play, Pause, RotateCcw, Info, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { Astra } from '../../components/Astra';
+
 
 export const Gravitation: React.FC = () => {
     const navigate = useNavigate();
@@ -46,7 +46,7 @@ export const Gravitation: React.FC = () => {
                 {activeTab === 'universal' && <UniversalLaw />}
                 {activeTab === 'kepler' && <KeplersLaws />}
             </div>
-            <Astra context="physics" topic="gravitation" />
+            
         </div>
     );
 };
@@ -305,3 +305,4 @@ const KeplersLaws: React.FC = () => {
         </div>
     );
 };
+

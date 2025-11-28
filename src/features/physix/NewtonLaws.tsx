@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Play, Pause, RotateCcw, Info, Wind } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { Astra } from '../../components/Astra';
+
 
 export const NewtonLaws: React.FC = () => {
     const navigate = useNavigate();
@@ -56,7 +56,7 @@ export const NewtonLaws: React.FC = () => {
                 {activeTab === 'second' && <SecondLaw />}
                 {activeTab === 'third' && <ThirdLaw />}
             </div>
-            <Astra context="physics" topic="newton" />
+            
         </div>
     );
 };
@@ -205,7 +205,7 @@ const FirstLaw: React.FC = () => {
                             style={{ transform: `translateX(${position + 40}px)` }}
                         >
                             <div className="w-20 h-8 flex items-center justify-center bg-red-100/80 rounded border border-red-300 backdrop-blur-sm">
-                                <span className="text-red-600 text-xs font-bold">← Friction</span>
+                                <span className="text-red-600 text-xs font-bold">â† Friction</span>
                             </div>
                         </div>
                     )}
@@ -294,7 +294,7 @@ const SecondLaw: React.FC = () => {
                         <div className="p-4 bg-gray-100 rounded-lg space-y-2">
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Acceleration (a):</span>
-                                <span className="font-bold text-brand-black">{acceleration.toFixed(2)} m/s²</span>
+                                <span className="font-bold text-brand-black">{acceleration.toFixed(2)} m/sÂ²</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Velocity (v):</span>
@@ -518,10 +518,10 @@ const ThirdLaw: React.FC = () => {
                     {!isPlaying && (
                         <div className="absolute bottom-40 left-1/2 -translate-x-1/2 flex gap-4 opacity-50">
                             <div className="flex items-center">
-                                <span className="text-blue-500 font-bold mr-2">← F1</span>
+                                <span className="text-blue-500 font-bold mr-2">â† F1</span>
                             </div>
                             <div className="flex items-center">
-                                <span className="text-red-500 font-bold ml-2">F2 →</span>
+                                <span className="text-red-500 font-bold ml-2">F2 â†’</span>
                             </div>
                         </div>
                     )}
@@ -530,3 +530,4 @@ const ThirdLaw: React.FC = () => {
         </div>
     );
 };
+

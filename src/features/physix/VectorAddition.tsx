@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Calculator, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { Astra } from '../../components/Astra';
+
 
 export const VectorAddition: React.FC = () => {
     const navigate = useNavigate();
@@ -89,7 +89,7 @@ export const VectorAddition: React.FC = () => {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Angle (θ): {angle}°
+                                    Angle (Î¸): {angle}Â°
                                 </label>
                                 <input
                                     type="range"
@@ -108,8 +108,8 @@ export const VectorAddition: React.FC = () => {
                                 <span className="font-bold text-brand-black">{resultant.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Direction (α):</span>
-                                <span className="font-bold text-brand-black">{resultantAngle.toFixed(2)}°</span>
+                                <span className="text-gray-600">Direction (Î±):</span>
+                                <span className="font-bold text-brand-black">{resultantAngle.toFixed(2)}Â°</span>
                             </div>
                         </div>
                     </Card>
@@ -120,10 +120,10 @@ export const VectorAddition: React.FC = () => {
                             <div>
                                 <h3 className="font-bold text-brand-blue mb-1">The Formula</h3>
                                 <p className="text-sm text-blue-800 mb-2">
-                                    R = √(A² + B² + 2ABcosθ)
+                                    R = âˆš(AÂ² + BÂ² + 2ABcosÎ¸)
                                 </p>
                                 <p className="text-sm text-blue-800">
-                                    tan α = (Bsinθ) / (A + Bcosθ)
+                                    tan Î± = (BsinÎ¸) / (A + BcosÎ¸)
                                 </p>
                             </div>
                         </div>
@@ -216,12 +216,13 @@ export const VectorAddition: React.FC = () => {
                                 stroke="#10B981"
                                 strokeWidth="2"
                             />
-                            <text x={originX + 40} y={originY - 10} fill="#10B981" fontSize="12">θ</text>
+                            <text x={originX + 40} y={originY - 10} fill="#10B981" fontSize="12">Î¸</text>
                         </svg>
                     </Card>
                 </div>
             </div>
-            <Astra context="physics" topic="vectors" />
+            
         </div>
     );
 };
+
