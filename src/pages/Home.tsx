@@ -11,7 +11,7 @@ export const Home: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useOutletContext<{ user: any }>();
     const containerRef = useRef<HTMLDivElement>(null);
-    const [username] = React.useState("Cadet"); // TODO: Replace with Google Login user data
+    // const [username] = React.useState("Cadet"); // Removed unused state
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start start", "end end"]
