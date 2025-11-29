@@ -1,11 +1,12 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import { X, Send, Book } from 'lucide-react';
+import { X, Send, Book, BrainCircuit } from 'lucide-react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Button } from './ui/Button';
 import { cn } from '../lib/utils';
+import { QuizInterface, type Question } from './QuizInterface';
 
 // Initialize Gemini API
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
@@ -27,7 +28,7 @@ interface AITutorOwlProps {
     context?: AITutorOwlContext;
 }
 
-// --- Mascot Owl Character (Duolingo Style) ---
+// --- "Simple & Nice" Mascot Owl ---
 const OwlAvatar = ({ onClick, isOpen }: { onClick: () => void, isOpen: boolean }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isBlinking, setIsBlinking] = useState(false);
@@ -38,11 +39,11 @@ const OwlAvatar = ({ onClick, isOpen }: { onClick: () => void, isOpen: boolean }
         const blinkInterval = setInterval(() => {
             setIsBlinking(true);
             setTimeout(() => setIsBlinking(false), 200);
-        }, 3000 + Math.random() * 2000); // Random blink interval
+        }, 3500);
         return () => clearInterval(blinkInterval);
     }, []);
 
-    // Entrance Animation
+    // Entrance Animation - Smooth Bounce
     useEffect(() => {
         controls.start({
             x: 0,
@@ -51,9 +52,9 @@ const OwlAvatar = ({ onClick, isOpen }: { onClick: () => void, isOpen: boolean }
             scale: 1,
             transition: {
                 type: "spring",
-                stiffness: 70,
-                damping: 12,
-                delay: 0.5
+                stiffness: 90,
+                damping: 14,
+                delay: 0.3
             }
         });
     }, [controls]);
@@ -61,58 +62,41 @@ const OwlAvatar = ({ onClick, isOpen }: { onClick: () => void, isOpen: boolean }
     return (
         <motion.div
             className="fixed bottom-8 right-8 z-50 cursor-pointer"
-            initial={{ x: 200, y: 50, opacity: 0, scale: 0.5 }}
+            initial={{ x: 150, y: 20, opacity: 0, scale: 0.8 }}
             animate={controls}
             onClick={onClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             style={{ display: isOpen ? 'none' : 'block' }}
         >
-            {/* Breathing Animation */}
+            {/* Gentle Float */}
             <motion.div
-                animate={{ scaleY: [1, 1.03, 1], y: [0, -2, 0] }}
-                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                animate={{ y: [0, -8, 0] }}
+                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
             >
-                <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* Shadow */}
-                    <ellipse cx="70" cy="130" rx="40" ry="6" fill="black" fillOpacity="0.2" />
+                <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Soft Shadow */}
+                    <ellipse cx="60" cy="110" rx="35" ry="5" fill="black" fillOpacity="0.15" />
 
-                    {/* Feet */}
-                    <path d="M55 125 L 45 135 L 65 135 Z" fill="#f59e0b" stroke="#b45309" strokeWidth="2" strokeLinejoin="round" />
-                    <path d="M85 125 L 75 135 L 95 135 Z" fill="#f59e0b" stroke="#b45309" strokeWidth="2" strokeLinejoin="round" />
-
-                    {/* Body - Plump Pear Shape */}
+                    {/* Body - Clean Rounded Shape */}
                     <path
-                        d="M35 120 C 15 120, 10 70, 30 50 C 40 40, 100 40, 110 50 C 130 70, 125 120, 105 120 C 90 120, 50 120, 35 120 Z"
+                        d="M60 105 C 35 105, 25 75, 25 60 C 25 35, 40 20, 60 20 C 80 20, 95 35, 95 60 C 95 75, 85 105, 60 105 Z"
                         fill="#3b82f6"
-                        stroke="#1d4ed8"
-                        strokeWidth="3"
                     />
 
-                    {/* Belly Patch */}
-                    <path
-                        d="M45 115 C 35 115, 30 80, 45 65 C 55 55, 85 55, 95 65 C 110 80, 105 115, 95 115 Z"
-                        fill="#bfdbfe"
-                    />
+                    {/* Belly - Soft Oval */}
+                    <ellipse cx="60" cy="75" rx="25" ry="22" fill="#bfdbfe" />
 
-                    {/* Head - Integrated with Body but defined by features */}
-
-                    {/* Eyes - Large and Expressive */}
-                    <g transform="translate(0, -5)">
+                    {/* Eyes - Friendly & Bright */}
+                    <g transform="translate(0, -2)">
                         {/* Left Eye */}
-                        <circle cx="50" cy="55" r="16" fill="white" stroke="#1d4ed8" strokeWidth="2" />
-                        <motion.circle
-                            cx="52"
-                            cy="55"
-                            r="6"
-                            fill="#1e3a8a"
-                            animate={isHovered ? { scaleY: 0.8, scaleX: 1.1 } : { scale: 1 }}
-                        />
-                        <circle cx="54" cy="53" r="2" fill="white" />
+                        <circle cx="48" cy="50" r="14" fill="white" />
+                        <circle cx="48" cy="50" r="5" fill="#1e3a8a" />
+                        <circle cx="50" cy="48" r="2" fill="white" />
 
                         {/* Left Eyelid */}
                         <motion.path
-                            d="M34 55 Q 50 75 66 55"
+                            d="M34 50 Q 48 64 62 50"
                             fill="#3b82f6"
                             initial={{ scaleY: 0 }}
                             animate={{ scaleY: isBlinking ? 1 : 0 }}
@@ -120,19 +104,13 @@ const OwlAvatar = ({ onClick, isOpen }: { onClick: () => void, isOpen: boolean }
                         />
 
                         {/* Right Eye */}
-                        <circle cx="90" cy="55" r="16" fill="white" stroke="#1d4ed8" strokeWidth="2" />
-                        <motion.circle
-                            cx="88"
-                            cy="55"
-                            r="6"
-                            fill="#1e3a8a"
-                            animate={isHovered ? { scaleY: 0.8, scaleX: 1.1 } : { scale: 1 }}
-                        />
-                        <circle cx="90" cy="53" r="2" fill="white" />
+                        <circle cx="72" cy="50" r="14" fill="white" />
+                        <circle cx="72" cy="50" r="5" fill="#1e3a8a" />
+                        <circle cx="74" cy="48" r="2" fill="white" />
 
                         {/* Right Eyelid */}
                         <motion.path
-                            d="M74 55 Q 90 75 106 55"
+                            d="M58 50 Q 72 64 86 50"
                             fill="#3b82f6"
                             initial={{ scaleY: 0 }}
                             animate={{ scaleY: isBlinking ? 1 : 0 }}
@@ -140,45 +118,35 @@ const OwlAvatar = ({ onClick, isOpen }: { onClick: () => void, isOpen: boolean }
                         />
                     </g>
 
-                    {/* Beak */}
-                    <path d="M70 60 Q 60 75 70 80 Q 80 75 70 60" fill="#f59e0b" stroke="#b45309" strokeWidth="1" />
-
-                    {/* Wings / Hands */}
+                    {/* Beak - Simple Rounded Triangle */}
+                    <path d="M60 58 Q 55 65 60 68 Q 65 65 60 58" fill="#f59e0b" />
 
                     {/* Right Wing (Holding Book) */}
-                    <g transform="translate(95, 80) rotate(-10)">
-                        {/* The Book */}
-                        <rect x="-5" y="-10" width="25" height="35" rx="2" fill="#7c2d12" stroke="#451a03" strokeWidth="1" />
-                        <rect x="0" y="-5" width="15" height="25" fill="white" />
-                        <path d="M2 0 L 13 0" stroke="black" strokeWidth="1" opacity="0.5" />
-                        <path d="M2 5 L 13 5" stroke="black" strokeWidth="1" opacity="0.5" />
-
-                        {/* The Wing wrapping around */}
-                        <path d="M-15 -5 Q 5 -5 10 15 Q 5 30 -15 20" fill="#3b82f6" stroke="#1d4ed8" strokeWidth="2" />
-                    </g>
+                    <path d="M85 60 Q 98 60 92 80 Q 80 85 75 75" fill="#3b82f6" />
+                    {/* Book */}
+                    <rect x="78" y="65" width="18" height="24" rx="2" fill="#7c2d12" transform="rotate(-10, 87, 77)" />
+                    <rect x="80" y="67" width="14" height="20" rx="1" fill="white" transform="rotate(-10, 87, 77)" />
 
                     {/* Left Wing (Waving) */}
                     <motion.g
-                        transform="translate(25, 80)"
-                        animate={isHovered ? { rotate: [0, -20, 10, -20, 0] } : { rotate: 0 }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                        style={{ originX: 20, originY: 0 }} // Pivot at shoulder
+                        transform="translate(25, 65)"
+                        animate={isHovered ? { rotate: [0, -25, 0, -25, 0] } : { rotate: 0 }}
+                        transition={{ duration: 0.8, ease: "easeInOut" }}
+                        style={{ originX: 10, originY: 5 }}
                     >
-                        <path
-                            d="M20 0 Q -10 10 -5 35 Q 10 40 25 20"
-                            fill="#3b82f6"
-                            stroke="#1d4ed8"
-                            strokeWidth="2"
-                        />
+                        <path d="M10 0 Q -5 10 0 25 Q 15 25 20 10" fill="#3b82f6" />
                     </motion.g>
 
-                    {/* Graduation Cap */}
-                    <g transform="translate(70, 25) rotate(-5)">
-                        <path d="M-30 0 L 0 -10 L 30 0 L 0 10 Z" fill="#1f2937" stroke="black" strokeWidth="1" />
-                        <rect x="-15" y="0" width="30" height="15" rx="5" fill="#1f2937" />
-                        {/* Tassel */}
-                        <path d="M0 0 L 20 15" stroke="#f59e0b" strokeWidth="2" />
-                        <circle cx="20" cy="15" r="3" fill="#f59e0b" />
+                    {/* Feet - Simple Nubs */}
+                    <path d="M50 102 Q 45 110 55 110 Q 60 105 55 102" fill="#f59e0b" />
+                    <path d="M70 102 Q 65 110 75 110 Q 80 105 75 102" fill="#f59e0b" />
+
+                    {/* Cap - Clean Icon Style */}
+                    <g transform="translate(60, 15) rotate(-5)">
+                        <rect x="-20" y="0" width="40" height="4" fill="#1f2937" rx="2" />
+                        <rect x="-12" y="-8" width="24" height="10" fill="#1f2937" rx="2" />
+                        <path d="M0 -8 L 15 5" stroke="#f59e0b" strokeWidth="1.5" />
+                        <circle cx="15" cy="5" r="2" fill="#f59e0b" />
                     </g>
 
                 </svg>
@@ -192,6 +160,9 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [isTyping, setIsTyping] = useState(false);
+    const [isQuizMode, setIsQuizMode] = useState(false);
+    const [quizQuestions, setQuizQuestions] = useState<Question[]>([]);
+    const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -288,9 +259,44 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
         }
     };
 
+    const startQuiz = async () => {
+        setIsQuizMode(true);
+        setIsLoadingQuiz(true);
+
+        try {
+            if (!genAI) throw new Error("API Key missing");
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+            const prompt = `Generate 3 multiple-choice questions about ${context} for a student.
+            Return ONLY a JSON array with this structure:
+            [{ "id": 1, "text": "Question?", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "Why A is correct" }]`;
+
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const text = response.text();
+
+            // Clean up code blocks if present
+            const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            const questions = JSON.parse(jsonString);
+
+            setQuizQuestions(questions);
+        } catch (error) {
+            console.error("Quiz Error:", error);
+            setIsQuizMode(false);
+            setMessages(prev => [...prev, {
+                id: Date.now().toString(),
+                text: "Hoo-no! I couldn't generate a quiz right now. Let's stick to chatting.",
+                sender: 'astra',
+                isError: true
+            }]);
+        } finally {
+            setIsLoadingQuiz(false);
+        }
+    };
+
     return (
         <>
-            {/* Mascot Owl Trigger */}
+            {/* Simple & Nice Owl Trigger */}
             <OwlAvatar onClick={() => setIsOpen(true)} isOpen={isOpen} />
 
             {/* Chat Window */}
@@ -315,64 +321,95 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
                                     </p>
                                 </div>
                             </div>
-                            <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
-                                <X className="w-5 h-5" />
-                            </Button>
-                        </div>
-
-                        {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
-                            {messages.map((msg) => (
-                                <div
-                                    key={msg.id}
-                                    className={cn(
-                                        "max-w-[85%] p-3 rounded-xl text-sm font-medium border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-                                        msg.sender === 'user'
-                                            ? "ml-auto bg-brand-blue text-white rounded-br-none"
-                                            : msg.isError
-                                                ? "mr-auto bg-red-100 text-red-800 rounded-bl-none border-red-500"
-                                                : "mr-auto bg-gray-100 text-brand-black rounded-bl-none"
-                                    )}
-                                >
-                                    {msg.sender === 'astra' && !msg.isError ? (
-                                        <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-gray-800 prose-pre:text-white prose-pre:p-2 prose-pre:rounded-lg">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                                {msg.text}
-                                            </ReactMarkdown>
-                                        </div>
-                                    ) : (
-                                        msg.text
-                                    )}
-                                </div>
-                            ))}
-                            {isTyping && (
-                                <div className="mr-auto bg-gray-100 p-3 rounded-xl rounded-bl-none border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex gap-1">
-                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
-                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
-                                </div>
-                            )}
-                            <div ref={messagesEndRef} />
-                        </div>
-
-                        {/* Input */}
-                        <div className="p-4 bg-gray-50 border-t-2 border-black">
-                            <form
-                                onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-                                className="flex gap-2"
-                            >
-                                <input
-                                    type="text"
-                                    value={inputValue}
-                                    onChange={(e) => setInputValue(e.target.value)}
-                                    placeholder={`Ask Prof Owl about ${context}...`}
-                                    className="flex-1 bg-white border-2 border-black rounded-xl px-4 py-2 text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none transition-all"
-                                />
-                                <Button type="submit" variant="primary" size="sm" className="rounded-xl px-3" disabled={isTyping}>
-                                    <Send className="w-4 h-4" />
+                            <div className="flex gap-2">
+                                {!isQuizMode && (
+                                    <Button variant="ghost" size="sm" onClick={startQuiz} title="Start Quiz">
+                                        <BrainCircuit className="w-5 h-5 text-brand-blue" />
+                                    </Button>
+                                )}
+                                <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
+                                    <X className="w-5 h-5" />
                                 </Button>
-                            </form>
+                            </div>
                         </div>
+
+                        {/* Content Area */}
+                        <div className="flex-1 overflow-hidden bg-white relative">
+                            {isQuizMode ? (
+                                isLoadingQuiz ? (
+                                    <div className="flex flex-col items-center justify-center h-full space-y-4">
+                                        <div className="w-12 h-12 border-4 border-brand-blue border-t-transparent rounded-full animate-spin" />
+                                        <p className="font-bold text-brand-black animate-pulse">Generating Quiz...</p>
+                                    </div>
+                                ) : (
+                                    <QuizInterface
+                                        questions={quizQuestions}
+                                        onComplete={(score) => {
+                                            // TODO: Award XP
+                                            console.log("Quiz Score:", score);
+                                        }}
+                                        onClose={() => setIsQuizMode(false)}
+                                    />
+                                )
+                            ) : (
+                                <>
+                                    <div className="absolute inset-0 overflow-y-auto p-4 space-y-4">
+                                        {messages.map((msg) => (
+                                            <div
+                                                key={msg.id}
+                                                className={cn(
+                                                    "max-w-[85%] p-3 rounded-xl text-sm font-medium border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
+                                                    msg.sender === 'user'
+                                                        ? "ml-auto bg-brand-blue text-white rounded-br-none"
+                                                        : msg.isError
+                                                            ? "mr-auto bg-red-100 text-red-800 rounded-bl-none border-red-500"
+                                                            : "mr-auto bg-gray-100 text-brand-black rounded-bl-none"
+                                                )}
+                                            >
+                                                {msg.sender === 'astra' && !msg.isError ? (
+                                                    <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-gray-800 prose-pre:text-white prose-pre:p-2 prose-pre:rounded-lg">
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                            {msg.text}
+                                                        </ReactMarkdown>
+                                                    </div>
+                                                ) : (
+                                                    msg.text
+                                                )}
+                                            </div>
+                                        ))}
+                                        {isTyping && (
+                                            <div className="mr-auto bg-gray-100 p-3 rounded-xl rounded-bl-none border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex gap-1">
+                                                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                                                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75" />
+                                                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150" />
+                                            </div>
+                                        )}
+                                        <div ref={messagesEndRef} />
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Input Area (Only show in Chat Mode) */}
+                        {!isQuizMode && (
+                            <div className="p-4 bg-gray-50 border-t-2 border-black">
+                                <form
+                                    onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+                                    className="flex gap-2"
+                                >
+                                    <input
+                                        type="text"
+                                        value={inputValue}
+                                        onChange={(e) => setInputValue(e.target.value)}
+                                        placeholder={`Ask Prof Owl about ${context}...`}
+                                        className="flex-1 bg-white border-2 border-black rounded-xl px-4 py-2 text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none transition-all"
+                                    />
+                                    <Button type="submit" variant="primary" size="sm" className="rounded-xl px-3" disabled={isTyping}>
+                                        <Send className="w-4 h-4" />
+                                    </Button>
+                                </form>
+                            </div>
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>

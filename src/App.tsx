@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Layout } from './layouts/Layout';
 import { Home } from './pages/Home';
+import { Profile } from './pages/Profile';
 import { PhysiX } from './pages/PhysiX';
 import { OhmsLaw } from './features/physix/OhmsLaw';
 import { VectorAddition } from './features/physix/VectorAddition';
@@ -153,6 +154,16 @@ function App() {
           <Route path='math/sets' element={
             <AuthGuard>
               <VennDiagram3D />
+            </AuthGuard>
+          } />
+          <Route path="/profile" element={
+            <AuthGuard>
+              <Profile />
+            </AuthGuard>
+          } />
+          <Route path="/illusions" element={
+            <AuthGuard>
+              <Navigate to="/" replace />
             </AuthGuard>
           } />
           <Route path='math/relations' element={
