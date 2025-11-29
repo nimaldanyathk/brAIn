@@ -2,7 +2,7 @@
 
 brAIn is an interactive STEM learning platform designed to make Physics, Chemistry, and Math come alive. It combines 3D simulations, AI tutoring, and gamification to create an engaging experience for students.
 
-## 📸 Screenshots
+## Screenshots
 
 ![Hero Section](PLACEHOLDER_HERO_IMAGE_URL)
 *The interactive home dashboard.*
@@ -13,14 +13,14 @@ brAIn is an interactive STEM learning platform designed to make Physics, Chemist
 ![Cadet Profile](PLACEHOLDER_PROFILE_IMAGE_URL)
 *Gamified profile with 3D badges and stats.*
 
-## ✨ Key Features
+## Features
 
 *   **Interactive Simulations:** Explore complex concepts with hands-on 3D models (Projectile Motion, Optics, Molecular Structures).
 *   **Prof Owl (AI Tutor):** A smart, friendly AI companion that answers questions and generates custom quizzes on the fly.
 *   **Gamification:** Earn XP, maintain streaks, and collect 3D badges in your personal Trophy Case.
 *   **Modern UI:** A sleek, "Ultramodern" interface with dark mode and smooth animations.
 
-## 🚀 How to Run
+## How to Run
 
 1.  **Install Dependencies:**
     ```bash
@@ -37,7 +37,7 @@ brAIn is an interactive STEM learning platform designed to make Physics, Chemist
     npm run build
     ```
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 *   **Frontend:** React, TypeScript, Vite
 *   **3D Graphics:** Three.js, React Three Fiber
@@ -46,4 +46,4 @@ brAIn is an interactive STEM learning platform designed to make Physics, Chemist
 *   **Styling:** Tailwind CSS, Framer Motion
 
 ---
-*Made with 🧠 for the students of tomorrow.*
+*🧠 Where Minds Evolve, Ideas Unfold*
