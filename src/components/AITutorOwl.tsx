@@ -160,9 +160,15 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [isTyping, setIsTyping] = useState(false);
+
+    // Quiz State
     const [isQuizMode, setIsQuizMode] = useState(false);
+    const [isQuizSetup, setIsQuizSetup] = useState(false); // New: Setup Mode
+    const [quizTopic, setQuizTopic] = useState(""); // New: Topic Input
+    const [quizCount, setQuizCount] = useState(3); // New: Question Count
     const [quizQuestions, setQuizQuestions] = useState<Question[]>([]);
     const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -180,6 +186,7 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
             text: getGreeting(context),
             sender: 'astra'
         }]);
+        setQuizTopic(context.charAt(0).toUpperCase() + context.slice(1)); // Default topic
     }, [context]);
 
     function getGreeting(ctx: AITutorOwlContext) {
@@ -259,15 +266,20 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
         }
     };
 
-    const startQuiz = async () => {
+    const handleQuizSetup = () => {
+        setIsQuizSetup(true);
         setIsQuizMode(true);
+    };
+
+    const startQuiz = async () => {
+        setIsQuizSetup(false);
         setIsLoadingQuiz(true);
 
         try {
             if (!genAI) throw new Error("API Key missing");
             const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-            const prompt = `Generate 3 multiple-choice questions about ${context} for a student.
+            const prompt = `Generate ${quizCount} multiple-choice questions about ${quizTopic} for a student.
             Return ONLY a JSON array with this structure:
             [{ "id": 1, "text": "Question?", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "Why A is correct" }]`;
 
@@ -323,7 +335,7 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
                             </div>
                             <div className="flex gap-2">
                                 {!isQuizMode && (
-                                    <Button variant="ghost" size="sm" onClick={startQuiz} title="Start Quiz">
+                                    <Button variant="ghost" size="sm" onClick={handleQuizSetup} title="Start Quiz">
                                         <BrainCircuit className="w-5 h-5 text-brand-blue" />
                                     </Button>
                                 )}
@@ -336,7 +348,54 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
                         {/* Content Area */}
                         <div className="flex-1 overflow-hidden bg-white relative">
                             {isQuizMode ? (
-                                isLoadingQuiz ? (
+                                isQuizSetup ? (
+                                    // Quiz Setup Form
+                                    <div className="flex flex-col items-center justify-center h-full p-6 space-y-6">
+                                        <div className="text-center space-y-2">
+                                            <BrainCircuit className="w-16 h-16 text-brand-blue mx-auto mb-2" />
+                                            <h2 className="text-2xl font-black text-brand-black">Quiz Setup</h2>
+                                            <p className="text-sm text-gray-500 font-medium">Customize your challenge!</p>
+                                        </div>
+
+                                        <div className="w-full space-y-4">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold uppercase text-gray-400">Topic</label>
+                                                <input
+                                                    type="text"
+                                                    value={quizTopic}
+                                                    onChange={(e) => setQuizTopic(e.target.value)}
+                                                    className="w-full border-2 border-black rounded-xl px-4 py-2 font-bold focus:outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                                                />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold uppercase text-gray-400">Questions: {quizCount}</label>
+                                                <input
+                                                    type="range"
+                                                    min="1"
+                                                    max="10"
+                                                    value={quizCount}
+                                                    onChange={(e) => setQuizCount(parseInt(e.target.value))}
+                                                    className="w-full accent-brand-blue h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                />
+                                                <div className="flex justify-between text-xs font-bold text-gray-400">
+                                                    <span>1</span>
+                                                    <span>5</span>
+                                                    <span>10</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-2 w-full">
+                                            <Button variant="ghost" onClick={() => setIsQuizMode(false)} className="flex-1">
+                                                Cancel
+                                            </Button>
+                                            <Button variant="primary" onClick={startQuiz} className="flex-1">
+                                                Start Quiz
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : isLoadingQuiz ? (
                                     <div className="flex flex-col items-center justify-center h-full space-y-4">
                                         <div className="w-12 h-12 border-4 border-brand-blue border-t-transparent rounded-full animate-spin" />
                                         <p className="font-bold text-brand-black animate-pulse">Generating Quiz...</p>
