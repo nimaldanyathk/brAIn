@@ -29,6 +29,34 @@ export const PomodoroTimer: React.FC = () => {
         };
     }, []);
 
+    const setDuration = (minutes: number, newMode: 'work' | 'break' | 'custom') => {
+        playClick();
+        setMode(newMode);
+        setTimeLeft(minutes * 60);
+        setIsActive(false);
+    };
+
+    // Handle Start Event from StudyMenu
+    useEffect(() => {
+        const handleStartSession = (event: CustomEvent) => {
+            const { duration } = event.detail;
+
+            // Manually set state to avoid setDuration's setIsActive(false) conflict
+            setMode('work');
+            setTimeLeft(duration * 60);
+            setIsActive(true);
+            setIsOpen(true);
+
+            // Play a "Charging" sound
+            const audio = new Audio('https://actions.google.com/sounds/v1/science_fiction/scifi_laser_1.ogg');
+            audio.volume = 0.4;
+            audio.play().catch(() => { });
+        };
+
+        window.addEventListener('BRAIN_START_SESSION' as any, handleStartSession as any);
+        return () => window.removeEventListener('BRAIN_START_SESSION' as any, handleStartSession as any);
+    }, []);
+
     // Handle White Noise Playback
     useEffect(() => {
         if (whiteNoiseRef.current) {
@@ -63,6 +91,11 @@ export const PomodoroTimer: React.FC = () => {
             setIsActive(false);
             playAlarm();
             alert(mode === 'work' ? "Time for a break!" : "Timer Complete!");
+
+            if (mode === 'work') {
+                // Dispatch event for Global Quiz
+                window.dispatchEvent(new CustomEvent('BRAIN_SESSION_COMPLETE'));
+            }
         }
 
         return () => {
@@ -83,12 +116,7 @@ export const PomodoroTimer: React.FC = () => {
         else setTimeLeft(customMinutes * 60);
     };
 
-    const setDuration = (minutes: number, newMode: 'work' | 'break' | 'custom') => {
-        playClick();
-        setMode(newMode);
-        setTimeLeft(minutes * 60);
-        setIsActive(false);
-    };
+
 
     const handleCustomSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -103,7 +131,7 @@ export const PomodoroTimer: React.FC = () => {
     };
 
     return (
-        <div className={`fixed right-0 top-1/2 -translate-y-1/2 z-50 transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-[calc(100%-40px)]'}`}>
+        <div className={`fixed right-0 top-1/2 -translate-y-1/2 z-[100] transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-[calc(100%-40px)]'}`}>
             <div className="flex items-start">
                 {/* Toggle Tab */}
                 <button
@@ -161,17 +189,33 @@ export const PomodoroTimer: React.FC = () => {
                         <Button
                             size={isCompact ? "sm" : "lg"}
                             onClick={toggleTimer}
-                            className={`flex-1 rounded-xl flex items-center justify-center border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-none transition-all ${isActive ? 'bg-yellow-400 hover:bg-yellow-500' : 'bg-green-400 hover:bg-green-500'}`}
+                            className={`flex-1 rounded-xl flex items-center justify-center border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-none transition-all ${isActive ? 'bg-yellow-400 hover:bg-yellow-500' : 'bg-emerald-400 hover:bg-emerald-500'}`}
                         >
                             {isActive ? <Pause className="w-5 h-5 text-black" /> : <Play className="w-5 h-5 text-black ml-1" />}
+                        </Button>
+
+                        {/* Finish Early Button */}
+                        <Button
+                            size={isCompact ? "sm" : "lg"}
+                            onClick={() => {
+                                playClick();
+                                setIsActive(false);
+                                // Dispatch Completion Event
+                                window.dispatchEvent(new CustomEvent('BRAIN_SESSION_COMPLETE'));
+                            }}
+                            className="w-12 rounded-xl flex items-center justify-center bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-green-100 active:translate-y-0.5 active:shadow-none transition-all"
+                            title="Finish Mission"
+                        >
+                            <Check className="w-5 h-5 text-green-600" />
                         </Button>
 
                         <Button
                             size={isCompact ? "sm" : "lg"}
                             onClick={resetTimer}
-                            className="w-12 rounded-xl flex items-center justify-center bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-100 active:translate-y-0.5 active:shadow-none transition-all"
+                            className="w-12 rounded-xl flex items-center justify-center bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-red-50 active:translate-y-0.5 active:shadow-none transition-all"
+                            title="Reset Timer"
                         >
-                            <RotateCcw className="w-5 h-5 text-black" />
+                            <RotateCcw className="w-5 h-5 text-red-500" />
                         </Button>
                     </div>
 

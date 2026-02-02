@@ -47,3 +47,4 @@ brAIn is an interactive STEM learning platform designed to make Physics, Chemist
 
 ---
 *🧠 Where Minds Evolve, Ideas Unfold*
+# NITT-hackathon-AI-for-education

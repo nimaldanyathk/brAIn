@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle, Trophy, ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle, XCircle, Clock, BrainCircuit, Trophy } from 'lucide-react';
 import { UltramodernButton } from './ui/UltramodernButton';
 
 export interface Question {
@@ -26,13 +27,57 @@ export const QuizInterface: React.FC<QuizInterfaceProps> = ({ questions, onCompl
 
     const currentQuestion = questions[currentQuestionIndex];
 
+    const [startTime, setStartTime] = useState(Date.now());
+
+    // Reset start time when question changes
+    React.useEffect(() => {
+        setStartTime(Date.now());
+    }, [currentQuestionIndex]);
+
+    const [srsMessage, setSrsMessage] = useState<string>("");
+
     const handleOptionClick = (index: number) => {
         if (isAnswered) return;
+        const endTime = Date.now();
+        const timeSpent = endTime - startTime;
+
         setSelectedOption(index);
         setIsAnswered(true);
 
-        if (index === currentQuestion.correctAnswer) {
+        const isCorrect = index === currentQuestion.correctAnswer;
+        if (isCorrect) {
             setScore(prev => prev + 1);
+        }
+
+        // Send data to backend
+        try {
+            const studentId = localStorage.getItem('student_id') || 'demo_student_123';
+            // Extract a simple topic_id from the question text or a prop (simplifying for demo)
+            // Ideally questions should have a 'topicId' field.
+            const topicId = (currentQuestion as any).topicId || "vectors";
+
+            fetch('http://localhost:8000/api/analyze-interaction', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    topic_id: topicId,
+                    question_id: currentQuestion.id.toString(),
+                    is_correct: isCorrect,
+                    time_spent_ms: timeSpent,
+                    confidence_score: 3, // Default for now, could add a slider later
+                    timestamp: new Date().toISOString()
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.srs_message) {
+                        setSrsMessage(data.srs_message);
+                    }
+                })
+                .catch(err => console.error("Failed to sync quiz result:", err));
+        } catch (e) {
+            console.error("Quiz sync error", e);
         }
     };
 
@@ -83,7 +128,7 @@ export const QuizInterface: React.FC<QuizInterfaceProps> = ({ questions, onCompl
                 <motion.div
                     className="h-full bg-brand-blue"
                     initial={{ width: 0 }}
-                    animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+                    animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}% ` }}
                 />
             </div>
 
@@ -152,13 +197,29 @@ export const QuizInterface: React.FC<QuizInterfaceProps> = ({ questions, onCompl
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t-2 border-black bg-gray-50 flex justify-end">
+            <div className="p-4 bg-gray-50 border-t-2 border-black flex justify-between items-center animate-in slide-in-from-bottom h-20">
+                <div>
+                    {/* SRS Feedback */}
+                    {isAnswered && srsMessage && (
+                        <div className="flex items-center gap-2 text-brand-blue font-bold text-lg animate-bounce">
+                            <BrainCircuit className="w-6 h-6" />
+                            {srsMessage} {/* e.g. "See you in 3 days!" */}
+                        </div>
+                    )}
+                    {isAnswered && !srsMessage && (
+                        <p className={`font - bold ${currentQuestion.correctAnswer === selectedOption ? "text-green-600" : "text-red-600"} `}>
+                            {currentQuestion.correctAnswer === selectedOption ? "Correct! +10xp" : "Missed it. Let's review."}
+                        </p>
+                    )}
+                </div>
+
                 <UltramodernButton
                     onClick={handleNext}
                     disabled={!isAnswered}
                     className={!isAnswered ? "opacity-50 cursor-not-allowed" : ""}
                 >
-                    {currentQuestionIndex < questions.length - 1 ? "Next Question" : "See Results"} <ArrowRight className="w-4 h-4 ml-2" />
+                    {currentQuestionIndex < questions.length - 1 ? "Next Question" : "Finish Quiz"}
+                    <ArrowRight className="w-4 h-4 ml-2" />
                 </UltramodernButton>
             </div>
         </div>

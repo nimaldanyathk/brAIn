@@ -1,16 +1,12 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { X, Send, Book, BrainCircuit } from 'lucide-react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { gemini } from '../lib/gemini';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Button } from './ui/Button';
 import { cn } from '../lib/utils';
 import { QuizInterface, type Question } from './QuizInterface';
-
-// Initialize Gemini API
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 export type AITutorOwlEmotion = 'idle' | 'happy' | 'thinking' | 'warning';
 export type AITutorOwlContext = 'physics' | 'math' | 'chemistry' | 'general';
@@ -219,35 +215,8 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
         setIsTyping(true);
 
         try {
-            if (!genAI) {
-                throw new Error("API Key not configured");
-            }
-
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-            // Construct history for context (last 5 messages)
-            const history = messages.slice(-5).map(m => ({
-                role: m.sender === 'user' ? 'user' : 'model',
-                parts: [{ text: m.text }]
-            }));
-
-            const chat = model.startChat({
-                history: [
-                    {
-                        role: "user",
-                        parts: [{ text: `System Instruction: ${getSystemPrompt(context)}` }],
-                    },
-                    {
-                        role: "model",
-                        parts: [{ text: "Understood. I am Prof Owl, ready to help with " + context + "." }],
-                    },
-                    ...history
-                ],
-            });
-
-            const result = await chat.sendMessage(userMsg.text);
-            const response = await result.response;
-            const text = response.text();
+            // Call the backend via our gemini service (which handles the API key on the server)
+            const text = await gemini.chat(userMsg.text, context);
 
             const astraMsg: Message = { id: (Date.now() + 1).toString(), text: text, sender: 'astra' };
             setMessages(prev => [...prev, astraMsg]);
@@ -256,7 +225,7 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
             console.error("Gemini API Error:", error);
             const errorMsg: Message = {
                 id: (Date.now() + 1).toString(),
-                text: !genAI ? "My brain link is missing (API Key). Please check configuration." : "I'm having trouble connecting to the mainframe. Please try again.",
+                text: "I'm having trouble connecting to my backend brain. Please ensure the python server is running.",
                 sender: 'astra',
                 isError: true
             };
@@ -276,18 +245,14 @@ export const AITutorOwl: React.FC<AITutorOwlProps> = ({ context = 'general' }) =
         setIsLoadingQuiz(true);
 
         try {
-            if (!genAI) throw new Error("API Key missing");
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
+            // Use the backend chat endpoint to generate the quiz JSON
             const prompt = `Generate ${quizCount} multiple-choice questions about ${quizTopic} for a student.
-            Return ONLY a JSON array with this structure:
+            Return ONLY a raw JSON array (no markdown code blocks) with this structure:
             [{ "id": 1, "text": "Question?", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "Why A is correct" }]`;
 
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const text = response.text();
+            const text = await gemini.chat(prompt, context);
 
-            // Clean up code blocks if present
+            // Clean up code blocks if present (backend might return markdown)
             const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
             const questions = JSON.parse(jsonString);
 

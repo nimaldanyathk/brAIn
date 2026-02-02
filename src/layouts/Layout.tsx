@@ -1,23 +1,78 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Brain, Atom, Calculator, FlaskConical, LogOut, User } from 'lucide-react';
+import { Brain, Atom, Calculator, FlaskConical, LogOut, User, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
 import { AITutorOwl } from '../components/AITutorOwl';
 import { PomodoroTimer } from '../components/PomodoroTimer';
+import { QuizInterface } from '../components/QuizInterface';
+import { MissionTracker } from '../components/MissionTracker';
 
 export const Layout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [user, setUser] = useState<any>(null);
+    const [showGlobalQuiz, setShowGlobalQuiz] = useState(false);
+    const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
+    const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
 
+    const FALLBACK_QUESTIONS = [
+        {
+            id: 1,
+            text: "What is the primary force governing planetary orbits?",
+            options: ["Magnetism", "Gravitation", "Strong Nuclear Force", "Friction"],
+            correctAnswer: 1,
+            explanation: "Gravity is the universal force of attraction acting between all matter."
+        },
+        {
+            id: 2,
+            text: "Newton's Second Law is represented by which formula?",
+            options: ["E=mc²", "F=ma", "a² + b² = c²", "V=IR"],
+            correctAnswer: 1,
+            explanation: "Force equals mass times acceleration (F=ma)."
+        },
+        {
+            id: 3,
+            text: "Which particle carries a negative charge?",
+            options: ["Proton", "Neutron", "Electron", "Photon"],
+            correctAnswer: 2,
+            explanation: "Electrons are negatively charged subatomic particles."
+        }
+    ];
 
-
-
-
-
+    // Global Quiz Trigger
     useEffect(() => {
-        // Check for Demo Session
+        const handleSessionComplete = async () => {
+            setShowGlobalQuiz(true);
+            setIsLoadingQuiz(true);
+
+            const topic = localStorage.getItem('brain_active_topic') || 'general';
+            const studentId = localStorage.getItem('student_id') || 'demo_student_123';
+
+            try {
+                // Determine API URL (handle dev vs prod if needed, assuming localhost for now)
+                const res = await fetch(`http://localhost:8000/api/generate-quiz?topic=${topic}&student_id=${studentId}`);
+                const data = await res.json();
+
+                if (Array.isArray(data) && data.length > 0) {
+                    setQuizQuestions(data);
+                } else {
+                    setQuizQuestions(FALLBACK_QUESTIONS);
+                }
+            } catch (e) {
+                console.error("Quiz fetch failed", e);
+                setQuizQuestions(FALLBACK_QUESTIONS);
+            } finally {
+                setIsLoadingQuiz(false);
+            }
+        };
+
+        window.addEventListener('BRAIN_SESSION_COMPLETE', handleSessionComplete);
+        return () => window.removeEventListener('BRAIN_SESSION_COMPLETE', handleSessionComplete);
+    }, []);
+
+    // Auth & Demo Session Check
+    useEffect(() => {
         const demoSession = localStorage.getItem('demo_session');
         if (demoSession) {
             setUser({
@@ -53,8 +108,6 @@ export const Layout: React.FC = () => {
         <div className={`flex flex-col bg-surface-gray font-sans text-brand-black selection:bg-brand-blue selection:text-white ${isHome ? 'min-h-screen' : 'h-screen overflow-hidden'}`}>
             {/* Top Navigation Bar */}
             <header className="h-16 bg-white border-b-2 border-black flex items-center justify-between px-6 shrink-0 z-50">
-                {/* Logo */}
-                {/* Logo */}
                 <div
                     className="flex items-center gap-3 cursor-pointer group"
                     onClick={() => navigate('/')}
@@ -65,12 +118,6 @@ export const Layout: React.FC = () => {
                     <span className="text-2xl font-display font-black tracking-tight group-hover:text-brand-blue transition-colors">brAIn</span>
                 </div>
 
-                {/* Navigation Links */}
-                {/* Navigation Links */}
-
-                {/* Navigation Links */}
-
-                {/* Navigation Links */}
                 <nav className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
                     <NavLink
                         to="/physix"
@@ -92,10 +139,6 @@ export const Layout: React.FC = () => {
                     </NavLink>
                 </nav>
 
-                {/* Full Screen Toggle */}
-
-
-                {/* User Profile */}
                 <div className="flex items-center gap-4">
                     {user ? (
                         <div className="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
@@ -123,21 +166,60 @@ export const Layout: React.FC = () => {
                 </div>
             </header>
 
-            {/* Main Content Area */}
             <main className={`flex-1 relative p-6 scroll-smooth ${isHome ? '' : 'overflow-y-auto'}`}>
                 <div className="h-full w-full max-w-7xl mx-auto flex flex-col">
                     <Outlet context={{ user }} />
                 </div>
             </main>
 
-
-
-
             {/* Global AI Assistant */}
             <AITutorOwl context={getContext(location.pathname)} />
 
             {/* Global Pomodoro Timer */}
             <PomodoroTimer />
+
+            {/* Tactical Mission Tracker */}
+            <MissionTracker />
+
+            {/* Global Quiz Overlay */}
+            {showGlobalQuiz && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+                    <div className="w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl relative">
+                        <button
+                            onClick={() => setShowGlobalQuiz(false)}
+                            className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors z-10"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        <div className="bg-brand-blue p-6 text-white flex flex-col items-center justify-center text-center">
+                            <Brain className="w-12 h-12 mb-3 animate-bounce" />
+                            <h2 className="text-2xl font-black uppercase tracking-wider">Session Complete!</h2>
+                            <p className="text-blue-100">
+                                {isLoadingQuiz ? "Generating tactical verification..." : "Let's verify what you just learned."}
+                            </p>
+                        </div>
+
+                        <div className="p-2 h-[500px] overflow-y-auto relative">
+                            {isLoadingQuiz ? (
+                                <div className="flex flex-col items-center justify-center h-full space-y-4">
+                                    <div className="w-12 h-12 border-4 border-brand-blue border-t-transparent rounded-full animate-spin" />
+                                    <p className="font-bold text-gray-400">Consulting Neural Core...</p>
+                                </div>
+                            ) : (
+                                <QuizInterface
+                                    questions={quizQuestions}
+                                    onClose={() => setShowGlobalQuiz(false)}
+                                    onComplete={() => {
+                                        alert("Verification Complete. Data synced to Neural Core.");
+                                        setShowGlobalQuiz(false);
+                                    }}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -148,15 +230,3 @@ function getContext(path: string): 'physics' | 'math' | 'chemistry' | 'general' 
     if (path.includes('chemistry') || path.includes('chemiverse')) return 'chemistry';
     return 'general';
 }
-
-
-
-
-
-
-
-
-
-
-
-

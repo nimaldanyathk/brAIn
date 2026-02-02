@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap, Lock, ArrowLeft, MoveDiagonal, Scale, Activity, Battery, Globe } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { QuizInterface } from '../components/QuizInterface';
 
 export const PhysiX: React.FC = () => {
     const navigate = useNavigate();
+    const [showPopQuiz, setShowPopQuiz] = useState(false);
+
+    // Simulate "Adaptive Check" trigger
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowPopQuiz(true);
+        }, 8000); // 8 seconds for demo
+        return () => clearTimeout(timer);
+    }, []);
 
     const experiments = [
         {
@@ -75,7 +85,36 @@ export const PhysiX: React.FC = () => {
     ];
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8">
+        <div className="max-w-5xl mx-auto space-y-8 relative">
+            {/* Pop Quiz Overlay */}
+            {showPopQuiz && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+                    <div className="w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl">
+                        <div className="bg-yellow-400 p-4 border-b-4 border-black flex justify-between items-center">
+                            <h2 className="text-xl font-black uppercase flex items-center gap-2">
+                                ⚠️ Field Check: Gravitation
+                            </h2>
+                            <button
+                                onClick={() => setShowPopQuiz(false)}
+                                className="font-bold hover:underline"
+                            >
+                                Close
+                            </button>
+                        </div>
+                        <div className="p-1">
+                            {/* Reusing QuizInterface but mocking a specific question */}
+                            <QuizInterface
+                                topicId="gravitation"
+                                onComplete={() => {
+                                    alert(`Field Check Complete! Efficiency verified.`);
+                                    setShowPopQuiz(false);
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="flex items-center gap-4">
                 <Button variant="ghost" onClick={() => navigate('/')} className="px-2">
                     <ArrowLeft className="w-6 h-6" />
